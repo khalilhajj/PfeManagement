@@ -1,7 +1,7 @@
 import React from 'react';
-
 const StudentDashboard = () => {
-  return <h1>Welcome to the Student Dashboard</h1>;
+
+  return <div className="administrator">Hello</div>;
 };
 
 export default StudentDashboard;

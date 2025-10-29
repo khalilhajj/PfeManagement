@@ -53,3 +53,5 @@ env/
 # Windows
 Thumbs.db
 ehthumbs.db
+
+reports/
