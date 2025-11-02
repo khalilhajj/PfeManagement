@@ -45,7 +45,6 @@
 }
 
 .administrator,
-.report-container,
 .products {
   display: flex;
   height: 90vh;

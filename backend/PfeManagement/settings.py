@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'authentication',
     'student',
+    'internship'
 ]
 AUTH_USER_MODEL = 'authentication.User'
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
