@@ -11,6 +11,8 @@ class Role(models.Model):
 
 
 class User(AbstractUser):
+    phone= models.CharField(max_length=15, blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):

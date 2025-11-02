@@ -27,6 +27,7 @@ urlpatterns = [
     # App routes
     path('auth/', include('authentication.urls')),
     path('student/', include('student.urls')),
+    path('internship/', include('internship.urls')),
 
     # JWT authentication endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

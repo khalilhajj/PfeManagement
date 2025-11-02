@@ -15,4 +15,10 @@ export const StudentSidebarData = [
         icon: <AiIcons.AiFillEdit />,
         cName: "nav-text"
     },
+    {
+        title: "Profile",
+        path: "/profile",
+        icon: <AiIcons.AiOutlineUser />,
+        cName: "nav-text"
+    },
 ];

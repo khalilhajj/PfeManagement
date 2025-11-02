@@ -8,6 +8,8 @@ import AdministratorDashboard from './pages/administrator/AdministratorDashboard
 import CompanyDashboard from './pages/company/CompanyDashboard';
 import Report from './Components/Reports/report';
 import ProtectedRoute from './Components/AuthComponent/ProtectedRoute';
+import Profile from "./pages/profile";
+import 'bootstrap/dist/css/bootstrap.min.css';
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
@@ -41,6 +43,12 @@ const router = createBrowserRouter([
         element: <ProtectedRoute allowedRoles={['Administrator', 'Teacher','Student']} />,
         children: [
           { path: "/archieved-reports", element: <Report /> },
+        ],
+      },
+      {
+        element: <ProtectedRoute allowedRoles={['Administrator', 'Teacher','Student']} />,
+        children: [
+          { path: "/profile", element: <Profile /> },
         ],
       },
     ],
