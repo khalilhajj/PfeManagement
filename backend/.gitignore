@@ -40,7 +40,7 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
-
+.coveragerc
 # Virtual environments
 venv/
 ENV/
@@ -55,5 +55,5 @@ Thumbs.db
 ehthumbs.db
 
 reports/
-
+profile_pics/
 Dockerfile

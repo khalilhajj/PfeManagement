@@ -91,6 +91,7 @@ class UserModelTest(TestCase):
         self.assertEqual(token['role_id'], self.role.id)
         self.assertEqual(token['role_name'], self.role.name)
         
+        # Verify we can get an access token from it
         access_token = str(token.access_token)
         self.assertIsNotNone(access_token)
         self.assertTrue(len(access_token) > 0)

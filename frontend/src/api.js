@@ -19,3 +19,14 @@ export const getreports = async () => {
     });
     return response.data;
 };
+
+export const getcurrentuser = async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) throw new Error('No access token found');
+    const response = await API.get('auth/get-user/', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+};

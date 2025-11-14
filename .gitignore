@@ -1,5 +1,7 @@
-.env
-
+.sonar/
+.github/
 # Snyk Security Extension - AI Rules (auto-generated)
-.github/instructions/snyk_rules.instructions.md
+.github\instructions\snyk_rules.instructions.md
+
+.env
 docker-desktop-amd64.deb
