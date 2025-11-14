@@ -13,16 +13,19 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+env_path = BASE_DIR.parent / '.env'
+if env_path.exists():
+    load_dotenv(env_path)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+ah(*wt7)1vd(7vi%)zc-!vh$=ijlzwfh-mb3@f!yuals+!ws_'
+SECRET_KEY =os.environ.get('DJANGO_SECRET_KEY') 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -49,7 +52,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'authentication.User'
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads') 
-# MEDIA_URL = '/media/'
+MEDIA_URL = '/media/'
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -115,12 +118,12 @@ WSGI_APPLICATION = 'PfeManagement.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'PFE',  # Database name
-        'USER': 'root',  # Database user
-        'PASSWORD': 'root',  # Database password
-        'HOST': 'localhost',  # Hostname (matches the service name in docker-compose)
-        'PORT': '5432',  # Default PostgreSQL port
+        'ENGINE': os.environ.get('DATABASE_ENGINE'),
+        'NAME': os.environ.get('DATABASE_NAME'),
+        'USER': os.environ.get('DATABASE_USER'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
+        'HOST': os.environ.get('DATABASE_HOST'),
+        'PORT': os.environ.get('DATABASE_PORT'),
     }
 }
 
