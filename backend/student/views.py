@@ -15,7 +15,7 @@ class ReportView(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
-        reports = Report.objects.filter(is_archived=False)
+        reports = Report.objects.filter(is_archived=True)
         serializer = ReportSerializer(reports, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
