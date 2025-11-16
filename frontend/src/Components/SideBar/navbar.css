@@ -241,3 +241,123 @@
     color: #ff6b6b;
     transform: rotate(90deg);
 }
+
+
+.navbar-right {
+    margin-left: auto;
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Notification Icon */
+.notification-icon {
+    position: relative;
+    cursor: pointer;
+    color: white;
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.notification-icon:hover {
+    transform: scale(1.1);
+}
+
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff4444;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+/* Bootstrap Dropdown Customization */
+.user-dropdown-toggle {
+    background: none !important;
+    border: none !important;
+    padding: 8px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    color: white !important;
+    text-decoration: none !important;
+    border-radius: 8px !important;
+    transition: background 0.3s ease !important;
+}
+
+.user-dropdown-toggle:hover,
+.user-dropdown-toggle:focus,
+.user-dropdown-toggle:active {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+    box-shadow: none !important;
+}
+
+.user-dropdown-toggle::after {
+    display: none !important;
+}
+
+.user-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.dropdown-arrow-icon {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.dropdown.show .dropdown-arrow-icon {
+    transform: rotate(180deg);
+}
+
+.user-dropdown-menu {
+    margin-top: 8px !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 8px !important;
+    min-width: 180px !important;
+    padding: 5px !important;
+}
+
+.logout-item {
+    display: flex !important;
+    align-items: center !important;
+    padding: 10px 16px !important;
+    color: #2c3e50 !important;
+    border-radius: 6px !important;
+    transition: background 0.2s ease !important;
+}
+
+.logout-item:hover,
+.logout-item:focus {
+    background: #f8f9fa !important;
+    color: #6a11cb !important;
+}
+
+.logout-item svg {
+    font-size: 1.2rem;
+    color: #6a11cb;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .user-name {
+        display: none;
+    }
+
+    .navbar-right {
+        gap: 15px;
+        margin-right: 10px;
+    }
+}

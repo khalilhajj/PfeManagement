@@ -23,7 +23,7 @@ class RoleModelTest(TestCase):
     def test_role_unique_name(self):
         """Test that role names must be unique"""
         with self.assertRaises(Exception):
-            Role.objects.create(name="Admin")  # Duplicate name
+            Role.objects.create(name="Admin")
     
     def test_role_max_length(self):
         """Test that role name respects max_length constraint"""

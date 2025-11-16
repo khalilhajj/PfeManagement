@@ -16,6 +16,9 @@ python manage.py makemigrations authentication
 echo "running migrations for student app..."
 python manage.py makemigrations student
 
+echo "running migrations for internship app..."
+python manage.py makemigrations internship
+
 echo "Running Django migrate..."
 python manage.py migrate
 
