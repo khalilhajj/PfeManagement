@@ -66,7 +66,7 @@ function Navbar() {
               </Dropdown.Toggle>
 
               <Dropdown.Menu className="user-dropdown-menu">
-                <Dropdown.Item onClick={handleLogout} className="logout-item">
+                <Dropdown.Item onClick={handleLogout} id="logout-button" className="logout-item">
                   <AiIcons.AiOutlineLogout className="me-2" />
                   Logout
                 </Dropdown.Item>

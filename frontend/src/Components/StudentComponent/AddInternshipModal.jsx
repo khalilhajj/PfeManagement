@@ -266,6 +266,7 @@ const AddInternshipModal = ({ onClose, onSuccess }) => {
                         </button>
                         <button
                             type="submit"
+                            id="submit-internship-button"
                             className="btn btn-primary"
                             disabled={loading}
                         >

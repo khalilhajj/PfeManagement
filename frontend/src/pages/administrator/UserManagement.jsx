@@ -357,18 +357,16 @@ const UserManagement = () => {
 
   return (
     <div className="user-management-container">
-      {/* Header */}
       <div className="page-header">
         <div>
           <h1><i className="fas fa-users-cog"></i> User Management</h1>
           <p>Manage system users and their roles</p>
         </div>
-        <button className="btn btn-primary" onClick={openCreateModal}>
+        <button id="add-user-button" className="btn btn-primary" onClick={openCreateModal}>
           <i className="fas fa-plus"></i> Add New User
         </button>
       </div>
 
-      {/* Stats Cards */}
       {stats && (
         <div className="stats-grid">
           <div className="stat-card stat-total">
@@ -562,7 +560,7 @@ const UserManagement = () => {
         </table>
       </div>
 
-      {/* Continue with modals in next response... */}
+      {/*modals */}
       {showCreateModal && (
         <div className="modal-overlay" onClick={closeAllModals}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -588,6 +586,7 @@ const UserManagement = () => {
                     <input
                       type="text"
                       name="username"
+                      id="username"
                       value={formData.username}
                       onChange={handleInputChange}
                       required
@@ -604,6 +603,7 @@ const UserManagement = () => {
                     <input
                       type="email"
                       name="email"
+                      id="email"
                       value={formData.email}
                       onChange={handleInputChange}
                       required
@@ -618,6 +618,7 @@ const UserManagement = () => {
                     <input
                       type="text"
                       name="first_name"
+                      id="first_name"
                       value={formData.first_name}
                       onChange={handleInputChange}
                       placeholder="Enter first name"
@@ -629,6 +630,7 @@ const UserManagement = () => {
                     <input
                       type="text"
                       name="last_name"
+                      id="last_name"
                       value={formData.last_name}
                       onChange={handleInputChange}
                       placeholder="Enter last name"
@@ -642,6 +644,7 @@ const UserManagement = () => {
                     <input
                       type="password"
                       name="password"
+                      id="password"
                       value={formData.password}
                       onChange={handleInputChange}
                       required
@@ -656,6 +659,7 @@ const UserManagement = () => {
                     <input
                       type="password"
                       name="password_confirm"
+                      id="password_confirm"
                       value={formData.password_confirm}
                       onChange={handleInputChange}
                       required
@@ -671,6 +675,7 @@ const UserManagement = () => {
                     <input
                       type="tel"
                       name="phone"
+                      id="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
                       placeholder="+1234567890"
@@ -681,6 +686,7 @@ const UserManagement = () => {
                   <div className="form-group">
                     <label>Role <span className="required">*</span></label>
                     <select
+                      id="role"
                       name="role"
                       value={formData.role}
                       onChange={handleInputChange}
@@ -698,6 +704,7 @@ const UserManagement = () => {
                   <label>Profile Picture</label>
                   <input
                     type="file"
+                    id="profile_picture"
                     name="profile_picture"
                     onChange={handleInputChange}
                     accept="image/jpeg,image/png,image/jpg,image/gif"
@@ -734,6 +741,7 @@ const UserManagement = () => {
                 </button>
                 <button
                   type="submit"
+                  id="confirm-user-button"
                   className="btn btn-primary"
                   disabled={actionLoading}
                 >

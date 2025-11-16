@@ -114,6 +114,7 @@ const StudentInternships = () => {
                 </div>
                 <button 
                     className="btn btn-primary btn-sm"
+                    id="add-internship-button"
                     onClick={() => setShowAddModal(true)}
                 >
                     <i className="fas fa-plus"></i>

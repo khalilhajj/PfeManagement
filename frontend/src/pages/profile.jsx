@@ -185,7 +185,7 @@ const Profile = () => {
             return `${BACKEND_URL}${user.profile_picture}`;
         }
         
-        return '/default-avatar.png';
+        return 'https://media.istockphoto.com/id/1491341037/vector/sasquatch-head-wearing-a-retro-eyeglasses-vector-illustration.jpg?s=612x612&w=0&k=20&c=cSFJOnASO13GhwPnYXjlHIA8u95jvi_zTJLJUsGJpcM=';
     };
 
     const handlePasswordChange = (e) => {
