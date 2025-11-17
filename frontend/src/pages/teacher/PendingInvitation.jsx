@@ -164,7 +164,8 @@ const PendingInvitation = () => {
 
                         return (
                             <div 
-                                key={invitation.id} 
+                                key={invitation.id}
+                                id={`invitation-card-${invitation.id}`}
                                 className={`invitation-card ${isExpanded ? 'expanded' : ''}`}
                             >
                                 <div className="card-header" onClick={() => toggleCard(invitation.id)}>
@@ -218,6 +219,7 @@ const PendingInvitation = () => {
                                         {invitation.status === 0 && (
                                             <div className="card-actions">
                                                 <button
+                                                    id="accept-invite"
                                                     className="btn btn-accept"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
@@ -294,6 +296,7 @@ const PendingInvitation = () => {
                                 Cancel
                             </button>
                             <button
+                                id="confirm-invitation"
                                 className={`btn ${actionType === 'accept' ? 'btn-accept' : 'btn-decline'}`}
                                 onClick={handleConfirm}
                                 disabled={actionLoading}
@@ -305,7 +308,7 @@ const PendingInvitation = () => {
                                     </>
                                 ) : (
                                     <>
-                                        <i className={`fas fa-${actionType === 'accept' ? 'check' : 'times'}`}></i>
+                                        <i  className={`fas fa-${actionType === 'accept' ? 'check' : 'times'}`}></i>
                                         Confirm
                                     </>
                                 )}

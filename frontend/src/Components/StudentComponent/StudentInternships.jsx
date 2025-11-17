@@ -149,8 +149,16 @@ const StudentInternships = () => {
                         const isExpanded = expandedCard === internship.id;
                         
                         return (
-                            <div key={internship.id} className={`internship-card ${isExpanded ? 'expanded' : ''}`}>
-                                <div className="card-header" onClick={() => toggleCard(internship.id)}>
+                            <div 
+                                key={internship.id}
+                                id={`internship-card-${internship.id}`}
+                                className={`internship-card ${isExpanded ? 'expanded' : ''}`}
+                            >
+                                <div 
+                                    id={`open-card-${internship.id}`}
+                                    className="card-header"
+                                    onClick={() => toggleCard(internship.id)}
+                                >                                    
                                     <div className="header-left">
                                         <h3>{internship.title}</h3>
                                         <span className="company-name">
@@ -207,6 +215,7 @@ const StudentInternships = () => {
                                         <div className="card-actions">
                                             {internship.status === 1 && !internship.teacher_id && (
                                                 <button 
+                                                    id={`invite-teacher-${internship.id}`}
                                                     className="btn btn-primary btn-sm"
                                                     onClick={(e) => {
                                                         e.stopPropagation();

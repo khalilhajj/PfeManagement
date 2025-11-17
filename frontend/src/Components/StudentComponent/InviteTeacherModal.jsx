@@ -175,6 +175,7 @@ const InviteTeacherModal = ({ internship, onClose, onSuccess }) => {
                         <div className="modal-actions">
                             <button
                                 type="button"
+                                id="cancel-invite-button"
                                 className="btn btn-secondary"
                                 onClick={onClose}
                                 disabled={loading}
@@ -183,6 +184,7 @@ const InviteTeacherModal = ({ internship, onClose, onSuccess }) => {
                             </button>
                             <button
                                 type="submit"
+                                id="send-invite-button"
                                 className="btn btn-primary"
                                 disabled={loading || !selectedTeacher}
                             >
