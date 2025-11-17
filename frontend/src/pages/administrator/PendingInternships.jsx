@@ -211,6 +211,7 @@ const PendingInternships = () => {
                                         <div className="action-buttons">
                                             <button
                                                 className="btn btn-approve"
+                                                id="admin-approve-button"
                                                 onClick={() => openConfirmModal(internship, 'approve')}
                                                 disabled={actionLoading === internship.id}
                                             >
@@ -219,6 +220,7 @@ const PendingInternships = () => {
                                             </button>
                                             <button
                                                 className="btn btn-reject"
+                                                id="admin-reject-button"
                                                 onClick={() => openConfirmModal(internship, 'reject')}
                                                 disabled={actionLoading === internship.id}
                                             >
@@ -282,6 +284,7 @@ const PendingInternships = () => {
 
                         <div className="modal-actions">
                             <button
+                                id="cancel-internship-button"
                                 className="btn btn-secondary"
                                 onClick={closeConfirmModal}
                                 disabled={actionLoading}
@@ -289,6 +292,7 @@ const PendingInternships = () => {
                                 Cancel
                             </button>
                             <button
+                                id={actionType === 'approve' ? 'approve-internship-button' : 'reject-internship-button'}
                                 className={`btn ${actionType === 'approve' ? 'btn-approve' : 'btn-reject'}`}
                                 onClick={handleConfirm}
                                 disabled={actionLoading}
