@@ -248,7 +248,13 @@ export const updateUser = async (userId, userData) => {
 };
 
 export const deleteUser = async (userId) => {
-  const response = await API.delete(`/administrator/users/${userId}/delete/`);
+  const response = await API.delete(`/administrator/users/${userId}/delete/`,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    });
   return response.data;
 };
 
