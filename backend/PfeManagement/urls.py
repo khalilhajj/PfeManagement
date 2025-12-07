@@ -21,12 +21,8 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    # Admin panel (optional)
-    # path('admin/', admin.site.urls),
-
-    # App routes
     path('auth/', include('authentication.urls')),
-    path('student/', include('student.urls')),
+    path('student/', include('report.urls')),
     path('internship/', include('internship.urls')),
 
     # JWT authentication endpoints
