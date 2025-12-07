@@ -13,6 +13,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import PendingInternships from "./pages/administrator/PendingInternships";
 import PendingInvitation from "./pages/teacher/PendingInvitation";
 import UserManagement from "./pages/administrator/UserManagement";
+import TeacherReportReview from "./pages/teacher/TeacherReportView";
+import StudentReports from "./pages/student/StudentReports";
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
@@ -25,9 +27,22 @@ const router = createBrowserRouter([
         ],
       },
       {
+        element: <ProtectedRoute allowedRoles={["Student"]} />,
+        children: [{ path: "/student/reports", element: <StudentReports /> }],
+      },
+      {
         element: <ProtectedRoute allowedRoles={["Teacher"]} />,
         children: [
           { path: "/teacher-dashboard", element: <TeacherDashboard /> },
+        ],
+      },
+      {
+        element: <ProtectedRoute allowedRoles={["Teacher"]} />,
+        children: [
+          {
+            path: "/teacher/pending-reviews",
+            element: <TeacherReportReview />,
+          },
         ],
       },
       {
@@ -54,11 +69,9 @@ const router = createBrowserRouter([
           { path: "/pending-internships", element: <PendingInternships /> },
         ],
       },
-            {
+      {
         element: <ProtectedRoute allowedRoles={["Administrator"]} />,
-        children: [
-          { path: "/user-management", element: <UserManagement /> },
-        ],
+        children: [{ path: "/user-management", element: <UserManagement /> }],
       },
       {
         element: (

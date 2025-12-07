@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 class ChangePasswordSerializer(serializers.Serializer):
+    
     old_password = serializers.CharField(required=True, write_only=True)
     new_password = serializers.CharField(required=True, write_only=True, min_length=8)
     confirm_password = serializers.CharField(required=True, write_only=True)
@@ -18,3 +19,6 @@ class ChangePasswordSerializer(serializers.Serializer):
         if len(value) < 8:
             raise serializers.ValidationError('Password must be at least 8 characters long.')
         return value
+
+    class Meta:
+        ref_name = "AuthChangePasswordSerializer"

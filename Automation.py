@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import os
 
 file_path = "cahier_de_charges.pdf"
-full_path = "C:/Users/fatma/OneDrive/Documents/cahier_de_charges.pdf"
+full_path = "/home/khalil/Downloads/Cahier_des_Charges_Projet.pdf"
 # Chrome options
 options = Options()
 options.add_argument("--start-maximized")
@@ -28,79 +28,79 @@ driver.get("http://localhost:3000")
 
 time.sleep(1)
 
-# username_field = driver.find_element(By.ID, "username")
-# username_field.send_keys("admin")
+username_field = driver.find_element(By.ID, "username")
+username_field.send_keys("admin")
 
-# password_field = driver.find_element(By.ID, "password")
-# password_field.send_keys("admin")
+password_field = driver.find_element(By.ID, "password")
+password_field.send_keys("admin")
 
-# login_button = driver.find_element(By.CSS_SELECTOR, "button.login-button")
-# login_button.click()
+login_button = driver.find_element(By.CSS_SELECTOR, "button.login-button")
+login_button.click()
 
-# time.sleep(3)
+time.sleep(3)
 
 #navigate to user management and add student
-# driver.get("http://localhost:3000/user-management")
-# time.sleep(1)
-# username_field = driver.find_element(By.ID, "add-user-button")
-# username_field.click()
-# username_field = driver.find_element(By.ID, "username")
-# username_field.send_keys("student")
-# email_field = driver.find_element(By.ID, "email")
-# email_field.send_keys("student@student.com")
-# first_name_field = driver.find_element(By.ID, "first_name")
-# first_name_field.send_keys("Student")
-# last_name_field = driver.find_element(By.ID, "last_name")
-# last_name_field.send_keys("Student")
-# password_field = driver.find_element(By.ID, "password")
-# password_field.send_keys("STUDENT123student")
-# confirm_password_field = driver.find_element(By.ID, "password_confirm")
-# confirm_password_field.send_keys("STUDENT123student")
-# phone_field = driver.find_element(By.ID, "phone")
-# phone_field.send_keys("12345678")
-# time.sleep(1)
-# role_select = Select(wait.until(
-#     EC.presence_of_element_located((By.ID, "role"))
-# ))
+driver.get("http://localhost:3000/user-management")
+time.sleep(1)
+username_field = driver.find_element(By.ID, "add-user-button")
+username_field.click()
+username_field = driver.find_element(By.ID, "username")
+username_field.send_keys("student")
+email_field = driver.find_element(By.ID, "email")
+email_field.send_keys("student@student.com")
+first_name_field = driver.find_element(By.ID, "first_name")
+first_name_field.send_keys("Student")
+last_name_field = driver.find_element(By.ID, "last_name")
+last_name_field.send_keys("Student")
+password_field = driver.find_element(By.ID, "password")
+password_field.send_keys("STUDENT123student")
+confirm_password_field = driver.find_element(By.ID, "password_confirm")
+confirm_password_field.send_keys("STUDENT123student")
+phone_field = driver.find_element(By.ID, "phone")
+phone_field.send_keys("12345678")
+time.sleep(1)
+role_select = Select(wait.until(
+    EC.presence_of_element_located((By.ID, "role"))
+))
 
-# role_select.select_by_visible_text("Student")
+role_select.select_by_visible_text("Student")
 
-# submit_button = driver.find_element(By.ID, "confirm-user-button")
-# submit_button.click()
+submit_button = driver.find_element(By.ID, "confirm-user-button")
+submit_button.click()
 
-# #Add teacher
-# username_field = driver.find_element(By.ID, "add-user-button")
-# username_field.click()
-# username_field = driver.find_element(By.ID, "username")
-# username_field.send_keys("teacher")
-# email_field = driver.find_element(By.ID, "email")
-# email_field.send_keys("teacher@teacher.com")
-# first_name_field = driver.find_element(By.ID, "first_name")
-# first_name_field.send_keys("Teacher")
-# last_name_field = driver.find_element(By.ID, "last_name")
-# last_name_field.send_keys("Teacher")
-# password_field = driver.find_element(By.ID, "password")
-# password_field.send_keys("TEACHER123teacher")
-# confirm_password_field = driver.find_element(By.ID, "password_confirm")
-# confirm_password_field.send_keys("TEACHER123teacher")
-# phone_field = driver.find_element(By.ID, "phone")
-# phone_field.send_keys("12345678")
-# time.sleep(1)
-# role_select = Select(wait.until(
-#     EC.presence_of_element_located((By.ID, "role"))
-# ))
+#Add teacher
+username_field = driver.find_element(By.ID, "add-user-button")
+username_field.click()
+username_field = driver.find_element(By.ID, "username")
+username_field.send_keys("teacher")
+email_field = driver.find_element(By.ID, "email")
+email_field.send_keys("teacher@teacher.com")
+first_name_field = driver.find_element(By.ID, "first_name")
+first_name_field.send_keys("Teacher")
+last_name_field = driver.find_element(By.ID, "last_name")
+last_name_field.send_keys("Teacher")
+password_field = driver.find_element(By.ID, "password")
+password_field.send_keys("TEACHER123teacher")
+confirm_password_field = driver.find_element(By.ID, "password_confirm")
+confirm_password_field.send_keys("TEACHER123teacher")
+phone_field = driver.find_element(By.ID, "phone")
+phone_field.send_keys("12345678")
+time.sleep(1)
+role_select = Select(wait.until(
+    EC.presence_of_element_located((By.ID, "role"))
+))
 
-# role_select.select_by_visible_text("Teacher")
+role_select.select_by_visible_text("Teacher")
 
-# submit_button = driver.find_element(By.ID, "confirm-user-button")
-# submit_button.click()
+submit_button = driver.find_element(By.ID, "confirm-user-button")
+submit_button.click()
 
 # #Logout admin
-# time.sleep(2)
-# dropdown_button = driver.find_element(By.ID, "user-dropdown")
-# dropdown_button.click()
-# logout_button = driver.find_element(By.ID, "logout-button")
-# logout_button.click()
+time.sleep(2)
+dropdown_button = driver.find_element(By.ID, "user-dropdown")
+dropdown_button.click()
+logout_button = driver.find_element(By.ID, "logout-button")
+logout_button.click()
 
 # ========================================
 

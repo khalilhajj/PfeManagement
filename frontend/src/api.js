@@ -248,7 +248,13 @@ export const updateUser = async (userId, userData) => {
 };
 
 export const deleteUser = async (userId) => {
-  const response = await API.delete(`/administrator/users/${userId}/delete/`);
+  const response = await API.delete(`/administrator/users/${userId}/delete/`,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    });
   return response.data;
 };
 
@@ -306,5 +312,147 @@ export const getAllUsers = async (params = {}) => {
         Authorization: `Bearer ${token}`,
       },
     });
+  return response.data;
+};
+
+
+// Report Management APIs
+export const createReport = async (reportData) => {
+  const isForm = reportData instanceof FormData;
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": isForm ? "multipart/form-data" : "application/json",
+  };
+
+  const response = await API.post("/student/reports/create/", reportData, {
+    headers,
+  });
+  return response.data;
+};
+
+export const getMyReports = async () => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.get("/student/reports/my-reports/", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const getReportDetail = async (reportId) => {
+  const response = await API.get(`/student/reports/${reportId}/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const uploadReportVersion = async (reportId, file) => {
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await API.post(
+    `/student/reports/${reportId}/upload-version/`,
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+
+export const submitVersionForReview = async (versionId) => {
+  const response = await API.post(
+    "/student/reports/versions/submit/",
+    { version_id: versionId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
+// Teacher Review APIs
+export const getPendingVersions = async () => {
+  const response = await API.get("/student/reports/versions/pending/", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const reviewVersion = async (versionId, action, isFinal = false, comment = "") => {
+
+  const response = await API.post(
+    `/student/reports/versions/${versionId}/review/`,
+    {
+      action,
+      is_final: isFinal,
+      comment,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
+export const addComment = async (versionId, commentData) => {
+  const isForm = commentData instanceof FormData;
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": isForm ? "multipart/form-data" : "application/json",
+  };
+
+  const response = await API.post(
+    `/student/reports/versions/${versionId}/comment/`,
+    commentData,
+    {
+      headers,
+    }
+  );
+  return response.data;
+};
+
+export const resolveComment = async (commentId) => {
+  const response = await API.post(
+    `/student/reports/comments/${commentId}/resolve/`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
+export const assignFinalGrade = async (reportId, finalGrade) => {
+  const response = await API.post(
+    `/student/reports/${reportId}/assign-grade/`,
+    {
+      final_grade: finalGrade,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
   return response.data;
 };

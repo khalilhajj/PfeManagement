@@ -154,3 +154,6 @@ class ChangePasswordSerializer(serializers.Serializer):
             })
         
         return attrs
+    
+    class Meta:
+        ref_name = "AdminChangePasswordSerializer"
