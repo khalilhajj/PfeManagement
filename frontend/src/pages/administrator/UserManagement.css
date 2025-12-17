@@ -880,3 +880,105 @@
 .users-table-container::-webkit-scrollbar-thumb:hover {
     background: #5568d3;
 }
+/* ...existing styles... */
+
+/* Alert Info */
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.alert-info i {
+    color: #0c5460;
+}
+
+/* Badge Pending */
+.badge-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* Password Display Modal */
+.password-display {
+    padding: 20px;
+}
+
+.password-display h3 {
+    margin: 0 0 20px 0;
+    color: #2c3e50;
+    font-size: 1.2rem;
+}
+
+.credential-item {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.credential-item.highlight {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+}
+
+.credential-item label {
+    display: block;
+    margin-bottom: 8px;
+    color: #6c757d;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.credential-value {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.credential-value code {
+    flex: 1;
+    padding: 10px 15px;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    color: #2c3e50;
+    word-break: break-all;
+}
+
+.password-code {
+    font-weight: bold;
+    color: #dc3545;
+    font-size: 1.1rem;
+}
+
+.link-code {
+    font-size: 0.85rem;
+}
+
+.btn-copy {
+    background: #667eea;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.btn-copy:hover {
+    background: #5568d3;
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .credential-value {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-copy {
+        width: 100%;
+    }
+}

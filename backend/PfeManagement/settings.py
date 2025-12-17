@@ -80,6 +80,10 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=1),
     'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
 }
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@pfemanagement.com'
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

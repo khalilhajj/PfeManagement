@@ -11,6 +11,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import MultiPartParser, FormParser
+from drf_yasg import openapi
 
 class LoginView(APIView):
     permission_classes = [AllowAny] 
@@ -18,8 +19,12 @@ class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         user = serializer.validated_data
+        if not user.is_enabled:
+            return Response({
+                'error': 'Your account is not activated yet. Please check your email for the activation link.'
+            }, status=status.HTTP_403_FORBIDDEN)
+               
         refresh = RefreshToken.for_user(user)
         token = user.get_token()
         return Response({
@@ -53,6 +58,11 @@ class GetUserView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         user = request.user
+        if not user.is_enabled:
+            return Response({
+                'error': 'Your account is not activated. Please check your email.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
         serializer = UserSerializer(user)
         return Response({
                 'first_name': user.first_name,
@@ -126,13 +136,11 @@ class DeleteAccountView(APIView):
         user = request.user
         username = user.username
         
-        # Hard delete the user account
         user.delete()
         
         return Response({
             'message': f'Account {username} has been successfully deleted.'
         }, status=status.HTTP_204_NO_CONTENT)
-
 
 class ChangePasswordView(APIView):
     """Change authenticated user's password"""
@@ -162,3 +170,78 @@ class ChangePasswordView(APIView):
         return Response({
             'message': 'Password changed successfully.'
         }, status=status.HTTP_200_OK)
+
+class ActivateAccountView(APIView):
+    """Activate user account via email token"""
+    permission_classes = [AllowAny]
+    
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'token',
+                openapi.IN_PATH,
+                description="Activation token from email",
+                type=openapi.TYPE_STRING,
+                required=True
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="Account activated successfully",
+                examples={
+                    "application/json": {
+                        "message": "Account activated successfully! You can now log in.",
+                        "username": "john_doe",
+                        "email": "john@example.com"
+                    }
+                }
+            ),
+            400: "Invalid or expired activation token",
+            404: "User not found"
+        }
+    )
+    def get(self, request, token):
+        """Activate account using token from email link"""
+        try:
+            # Find user by activation token
+            user = User.objects.get(activation_token=token)
+            
+            # Check if already activated
+            if user.is_enabled:
+                return Response({
+                    'message': 'Account is already activated. You can log in.',
+                    'username': user.username
+                }, status=status.HTTP_200_OK)
+            
+            # Activate account
+            user.is_enabled = True
+            user.email_verified = True  # Also mark email as verified
+            user.save()
+            
+            return Response({
+                'message': 'Account activated successfully! You can now log in.',
+                'username': user.username,
+                'email': user.email
+            }, status=status.HTTP_200_OK)
+            
+        except User.DoesNotExist:
+            return Response({
+                'error': 'Invalid activation token. Please contact support.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+class AddUserView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    permission_classes = [AllowAny]
+    
+    @swagger_auto_schema(request_body=UserSerializer)
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'role': user.role.name if user.role else None,
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -14,7 +14,14 @@ class User(AbstractUser):
     phone= models.CharField(max_length=15, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
-
+    email_verified = models.BooleanField(default=False)
+    verification_token = models.CharField(max_length=255, blank=True, null=True)
+    verification_token_created = models.DateTimeField(blank=True, null=True)
+    is_enabled = models.BooleanField(default=False)
+    activation_token = models.CharField(max_length=255, blank=True, null=True, unique=True)
+    activation_token_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+  
     def __str__(self):
         return self.username
     

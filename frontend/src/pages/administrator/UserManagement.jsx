@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   getAllUsers,
   getUserDetail,
@@ -7,50 +7,49 @@ import {
   deleteUser,
   resetUserPassword,
   getAllRoles,
-  getUserStats
-} from '../../api';
-import './UserManagement.css';
+  getUserStats,
+} from "../../api";
+import "./UserManagement.css";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
   // Filters
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedRoleFilter, setSelectedRoleFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedRoleFilter, setSelectedRoleFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
   // Modals
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
-  
+
   const [selectedUser, setSelectedUser] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
-  
+
   // Form states
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    password_confirm: '',
-    first_name: '',
-    last_name: '',
-    phone: '',
-    role: '',
+    username: "",
+    email: "",
+    first_name: "",
+    last_name: "",
+    phone: "",
+    role: "",
     is_active: true,
-    profile_picture: null
+    profile_picture: null,
   });
-  
+
   const [passwordData, setPasswordData] = useState({
-    new_password: '',
-    new_password_confirm: ''
+    new_password: "",
+    new_password_confirm: "",
   });
 
   const [profilePreview, setProfilePreview] = useState(null);
@@ -68,28 +67,28 @@ const UserManagement = () => {
     try {
       const [rolesData, statsData] = await Promise.all([
         getAllRoles(),
-        getUserStats()
+        getUserStats(),
       ]);
       setRoles(rolesData);
       setStats(statsData);
     } catch (err) {
-      console.error('Failed to load initial data:', err);
+      console.error("Failed to load initial data:", err);
     }
   };
 
   const fetchUsers = async () => {
     setLoading(true);
-    setError('');
+    setError("");
     try {
       const params = {};
       if (searchTerm) params.search = searchTerm;
       if (selectedRoleFilter) params.role = selectedRoleFilter;
-      if (statusFilter !== '') params.is_active = statusFilter === 'active';
-      
+      if (statusFilter !== "") params.is_active = statusFilter === "active";
+
       const data = await getAllUsers(params);
       setUsers(data);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to load users');
+      setError(err.response?.data?.error || "Failed to load users");
       console.error(err);
     } finally {
       setLoading(false);
@@ -98,27 +97,32 @@ const UserManagement = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-    
-    if (type === 'checkbox') {
-      setFormData(prev => ({ ...prev, [name]: checked }));
-    } else if (type === 'file') {
+
+    if (type === "checkbox") {
+      setFormData((prev) => ({ ...prev, [name]: checked }));
+    } else if (type === "file") {
       const file = files[0];
       if (file) {
         // Validate file type
-        const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+        const validTypes = [
+          "image/jpeg",
+          "image/png",
+          "image/jpg",
+          "image/gif",
+        ];
         if (!validTypes.includes(file.type)) {
-          setError('Please select a valid image file (JPEG, PNG, GIF)');
+          setError("Please select a valid image file (JPEG, PNG, GIF)");
           return;
         }
-        
+
         // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
-          setError('Image size must be less than 5MB');
+          setError("Image size must be less than 5MB");
           return;
         }
-        
-        setFormData(prev => ({ ...prev, [name]: file }));
-        
+
+        setFormData((prev) => ({ ...prev, [name]: file }));
+
         // Create preview
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -127,38 +131,38 @@ const UserManagement = () => {
         reader.readAsDataURL(file);
       }
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
-    setPasswordData(prev => ({ ...prev, [name]: value }));
+    setPasswordData((prev) => ({ ...prev, [name]: value }));
   };
 
   const resetForm = () => {
     setFormData({
-      username: '',
-      email: '',
-      password: '',
-      password_confirm: '',
-      first_name: '',
-      last_name: '',
-      phone: '',
-      role: '',
+      username: "",
+      email: "",
+      password: "",
+      password_confirm: "",
+      first_name: "",
+      last_name: "",
+      phone: "",
+      role: "",
       is_active: true,
-      profile_picture: null
+      profile_picture: null,
     });
     setProfilePreview(null);
-    setError('');
+    setError("");
   };
 
   const resetPasswordForm = () => {
     setPasswordData({
-      new_password: '',
-      new_password_confirm: ''
+      new_password: "",
+      new_password_confirm: "",
     });
-    setError('');
+    setError("");
   };
 
   const openCreateModal = () => {
@@ -171,16 +175,18 @@ const UserManagement = () => {
     setFormData({
       username: user.username,
       email: user.email,
-      password: '',
-      password_confirm: '',
-      first_name: user.first_name || '',
-      last_name: user.last_name || '',
-      phone: user.phone || '',
+      password: "",
+      password_confirm: "",
+      first_name: user.first_name || "",
+      last_name: user.last_name || "",
+      phone: user.phone || "",
       role: user.role,
       is_active: user.is_active,
-      profile_picture: null
+      profile_picture: null,
     });
-    setProfilePreview(user.profile_picture ? `${BACKEND_URL}${user.profile_picture}` : null);
+    setProfilePreview(
+      user.profile_picture ? `${BACKEND_URL}${user.profile_picture}` : null
+    );
     setShowEditModal(true);
   };
 
@@ -201,7 +207,7 @@ const UserManagement = () => {
       setSelectedUser(detailData);
       setShowDetailModal(true);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to load user details');
+      setError(err.response?.data?.error || "Failed to load user details");
     }
   };
 
@@ -219,29 +225,42 @@ const UserManagement = () => {
   const handleCreate = async (e) => {
     e.preventDefault();
     setActionLoading(true);
-    setError('');
-    setSuccessMessage('');
+    setError("");
+    setSuccessMessage("");
 
     try {
       const response = await createUser(formData);
-      setSuccessMessage(response.message || 'User created successfully!');
+
+      // Show generated password to admin
+      if (response.generated_password) {
+        setGeneratedPassword({
+          password: response.generated_password,
+          username: response.data.username,
+          email: response.data.email,
+          activation_link: response.activation_link,
+        });
+        setShowPasswordModal(true);
+      }
+
+      setSuccessMessage(response.message || "User created successfully!");
       await fetchUsers();
       await fetchInitialData(); // Refresh stats
-      closeAllModals();
-      setTimeout(() => setSuccessMessage(''), 3000);
+      setShowCreateModal(false);
+      setTimeout(() => setSuccessMessage(""), 5000);
     } catch (err) {
       const errorData = err.response?.data;
-      if (errorData && typeof errorData === 'object') {
-        // Display field-specific errors
+      if (errorData && typeof errorData === "object") {
         const errorMessages = Object.entries(errorData)
           .map(([field, messages]) => {
-            const messageArray = Array.isArray(messages) ? messages : [messages];
-            return `${field}: ${messageArray.join(', ')}`;
+            const messageArray = Array.isArray(messages)
+              ? messages
+              : [messages];
+            return `${field}: ${messageArray.join(", ")}`;
           })
-          .join('\n');
+          .join("\n");
         setError(errorMessages);
       } else {
-        setError(errorData?.error || 'Failed to create user');
+        setError(errorData?.error || "Failed to create user");
       }
     } finally {
       setActionLoading(false);
@@ -251,33 +270,35 @@ const UserManagement = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     setActionLoading(true);
-    setError('');
-    setSuccessMessage('');
+    setError("");
+    setSuccessMessage("");
 
     try {
       const updateData = { ...formData };
       delete updateData.username; // Username cannot be updated
       delete updateData.password; // Password updated separately
       delete updateData.password_confirm;
-      
+
       const response = await updateUser(selectedUser.id, updateData);
-      setSuccessMessage(response.message || 'User updated successfully!');
+      setSuccessMessage(response.message || "User updated successfully!");
       await fetchUsers();
       await fetchInitialData(); // Refresh stats
       closeAllModals();
-      setTimeout(() => setSuccessMessage(''), 3000);
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       const errorData = err.response?.data;
-      if (errorData && typeof errorData === 'object') {
+      if (errorData && typeof errorData === "object") {
         const errorMessages = Object.entries(errorData)
           .map(([field, messages]) => {
-            const messageArray = Array.isArray(messages) ? messages : [messages];
-            return `${field}: ${messageArray.join(', ')}`;
+            const messageArray = Array.isArray(messages)
+              ? messages
+              : [messages];
+            return `${field}: ${messageArray.join(", ")}`;
           })
-          .join('\n');
+          .join("\n");
         setError(errorMessages);
       } else {
-        setError(errorData?.error || 'Failed to update user');
+        setError(errorData?.error || "Failed to update user");
       }
     } finally {
       setActionLoading(false);
@@ -286,18 +307,18 @@ const UserManagement = () => {
 
   const handleDelete = async () => {
     setActionLoading(true);
-    setError('');
-    setSuccessMessage('');
+    setError("");
+    setSuccessMessage("");
 
     try {
       const response = await deleteUser(selectedUser.id);
-      setSuccessMessage(response.message || 'User deleted successfully!');
+      setSuccessMessage(response.message || "User deleted successfully!");
       await fetchUsers();
       await fetchInitialData(); // Refresh stats
       closeAllModals();
-      setTimeout(() => setSuccessMessage(''), 3000);
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to delete user');
+      setError(err.response?.data?.error || "Failed to delete user");
     } finally {
       setActionLoading(false);
     }
@@ -306,33 +327,43 @@ const UserManagement = () => {
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setActionLoading(true);
-    setError('');
-    setSuccessMessage('');
+    setError("");
+    setSuccessMessage("");
 
     try {
       const response = await resetUserPassword(selectedUser.id, passwordData);
-      setSuccessMessage(response.message || 'Password reset successfully!');
+      setSuccessMessage(response.message || "Password reset successfully!");
       closeAllModals();
-      setTimeout(() => setSuccessMessage(''), 3000);
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       const errorData = err.response?.data;
-      if (errorData && typeof errorData === 'object') {
+      if (errorData && typeof errorData === "object") {
         const errorMessages = Object.entries(errorData)
           .map(([field, messages]) => {
-            const messageArray = Array.isArray(messages) ? messages : [messages];
-            return `${field}: ${messageArray.join(', ')}`;
+            const messageArray = Array.isArray(messages)
+              ? messages
+              : [messages];
+            return `${field}: ${messageArray.join(", ")}`;
           })
-          .join('\n');
+          .join("\n");
         setError(errorMessages);
       } else {
-        setError(errorData?.error || 'Failed to reset password');
+        setError(errorData?.error || "Failed to reset password");
       }
     } finally {
       setActionLoading(false);
     }
   };
 
-  const getStatusBadge = (isActive) => {
+  const getStatusBadge = (isActive, isEnabled) => {
+    if (!isEnabled) {
+      return (
+        <span className="badge badge-pending">
+          <i className="fas fa-clock"></i> Pending Activation
+        </span>
+      );
+    }
+
     return isActive ? (
       <span className="badge badge-active">
         <i className="fas fa-check-circle"></i> Active
@@ -343,7 +374,11 @@ const UserManagement = () => {
       </span>
     );
   };
-
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    setSuccessMessage("Copied to clipboard!");
+    setTimeout(() => setSuccessMessage(""), 2000);
+  };
   if (loading && users.length === 0) {
     return (
       <div className="user-management-container">
@@ -359,10 +394,16 @@ const UserManagement = () => {
     <div className="user-management-container">
       <div className="page-header">
         <div>
-          <h1><i className="fas fa-users-cog"></i> User Management</h1>
+          <h1>
+            <i className="fas fa-users-cog"></i> User Management
+          </h1>
           <p>Manage system users and their roles</p>
         </div>
-        <button id="add-user-button" className="btn btn-primary" onClick={openCreateModal}>
+        <button
+          id="add-user-button"
+          className="btn btn-primary"
+          onClick={openCreateModal}
+        >
           <i className="fas fa-plus"></i> Add New User
         </button>
       </div>
@@ -414,7 +455,7 @@ const UserManagement = () => {
       {error && (
         <div className="alert alert-error">
           <i className="fas fa-exclamation-circle"></i>
-          <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
+          <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>{error}</pre>
         </div>
       )}
 
@@ -436,15 +477,17 @@ const UserManagement = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        
+
         <select
           value={selectedRoleFilter}
           onChange={(e) => setSelectedRoleFilter(e.target.value)}
           className="filter-select"
         >
           <option value="">All Roles</option>
-          {roles.map(role => (
-            <option key={role.id} value={role.id}>{role.name}</option>
+          {roles.map((role) => (
+            <option key={role.id} value={role.id}>
+              {role.name}
+            </option>
           ))}
         </select>
 
@@ -462,9 +505,9 @@ const UserManagement = () => {
           <button
             className="btn btn-secondary"
             onClick={() => {
-              setSearchTerm('');
-              setSelectedRoleFilter('');
-              setStatusFilter('');
+              setSearchTerm("");
+              setSelectedRoleFilter("");
+              setStatusFilter("");
             }}
           >
             <i className="fas fa-times"></i> Clear Filters
@@ -495,13 +538,16 @@ const UserManagement = () => {
                 </td>
               </tr>
             ) : (
-              users.map(user => (
+              users.map((user) => (
                 <tr key={user.id}>
                   <td>
                     <div className="user-cell">
                       <div className="user-avatar">
                         {user.profile_picture ? (
-                          <img src={`${BACKEND_URL}${user.profile_picture}`} alt={user.username} />
+                          <img
+                            src={`${BACKEND_URL}${user.profile_picture}`}
+                            alt={user.username}
+                          />
                         ) : (
                           <i className="fas fa-user"></i>
                         )}
@@ -513,14 +559,18 @@ const UserManagement = () => {
                     </div>
                   </td>
                   <td>{user.email}</td>
-                  <td>{user.phone || '-'}</td>
+                  <td>{user.phone || "-"}</td>
                   <td>
-                    <span className={`role-badge role-${user.role_name?.toLowerCase()}`}>
+                    <span
+                      className={`role-badge role-${user.role_name?.toLowerCase()}`}
+                    >
                       {user.role_name}
                     </span>
                   </td>
-                  <td>{getStatusBadge(user.is_active)}</td>
-                  <td>{new Date(user.date_joined).toLocaleDateString('en-GB')}</td>
+                  <td>{getStatusBadge(user.is_active, user.is_enabled)}</td>
+                  <td>
+                    {new Date(user.date_joined).toLocaleDateString("en-GB")}
+                  </td>
                   <td>
                     <div className="action-buttons">
                       <button
@@ -561,7 +611,7 @@ const UserManagement = () => {
       </div>
 
       {/*modals */}
-      {showCreateModal && (
+            {showCreateModal && (
         <div className="modal-overlay" onClick={closeAllModals}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
@@ -579,6 +629,11 @@ const UserManagement = () => {
                     <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
                   </div>
                 )}
+
+                <div className="alert alert-info">
+                  <i className="fas fa-info-circle"></i>
+                  <p>A secure password will be automatically generated and sent to the user via email along with an activation link.</p>
+                </div>
 
                 <div className="form-row">
                   <div className="form-group">
@@ -614,57 +669,28 @@ const UserManagement = () => {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label>First Name</label>
+                    <label>First Name <span className="required">*</span></label>
                     <input
                       type="text"
                       name="first_name"
                       id="first_name"
                       value={formData.first_name}
                       onChange={handleInputChange}
+                      required
                       placeholder="Enter first name"
                     />
                   </div>
 
                   <div className="form-group">
-                    <label>Last Name</label>
+                    <label>Last Name <span className="required">*</span></label>
                     <input
                       type="text"
                       name="last_name"
                       id="last_name"
                       value={formData.last_name}
                       onChange={handleInputChange}
+                      required
                       placeholder="Enter last name"
-                    />
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Password <span className="required">*</span></label>
-                    <input
-                      type="password"
-                      name="password"
-                      id="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      required
-                      minLength={8}
-                      placeholder="Enter password"
-                    />
-                    <small>Min 8 characters, include uppercase, lowercase, and digit</small>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Confirm Password <span className="required">*</span></label>
-                    <input
-                      type="password"
-                      name="password_confirm"
-                      id="password_confirm"
-                      value={formData.password_confirm}
-                      onChange={handleInputChange}
-                      required
-                      minLength={8}
-                      placeholder="Confirm password"
                     />
                   </div>
                 </div>
@@ -727,6 +753,7 @@ const UserManagement = () => {
                     />
                     <span>Active Account</span>
                   </label>
+                  <small>User will still need to activate via email</small>
                 </div>
               </div>
 
@@ -753,7 +780,7 @@ const UserManagement = () => {
                   ) : (
                     <>
                       <i className="fas fa-check"></i>
-                      Create User
+                      Create User & Send Email
                     </>
                   )}
                 </button>
@@ -762,13 +789,108 @@ const UserManagement = () => {
           </div>
         </div>
       )}
+      {/* Generated Password Display Modal */}
+      {showPasswordModal && generatedPassword && (
+        <div className="modal-overlay" onClick={closeAllModals}>
+          <div className="modal-content modal-small" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2><i className="fas fa-key"></i> User Created Successfully</h2>
+              <button className="modal-close" onClick={closeAllModals}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
 
+            <div className="modal-body">
+              <div className="alert alert-success">
+                <i className="fas fa-check-circle"></i>
+                <p>User account created and activation email sent!</p>
+              </div>
+
+              <div className="password-display">
+                <h3>Generated Credentials</h3>
+                
+                <div className="credential-item">
+                  <label>Username:</label>
+                  <div className="credential-value">
+                    <code>{generatedPassword.username}</code>
+                    <button
+                      className="btn-icon btn-copy"
+                      onClick={() => copyToClipboard(generatedPassword.username)}
+                      title="Copy"
+                    >
+                      <i className="fas fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="credential-item">
+                  <label>Email:</label>
+                  <div className="credential-value">
+                    <code>{generatedPassword.email}</code>
+                    <button
+                      className="btn-icon btn-copy"
+                      onClick={() => copyToClipboard(generatedPassword.email)}
+                      title="Copy"
+                    >
+                      <i className="fas fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="credential-item highlight">
+                  <label>Password:</label>
+                  <div className="credential-value">
+                    <code className="password-code">{generatedPassword.password}</code>
+                    <button
+                      className="btn-icon btn-copy"
+                      onClick={() => copyToClipboard(generatedPassword.password)}
+                      title="Copy"
+                    >
+                      <i className="fas fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+
+                {generatedPassword.activation_link && (
+                  <div className="credential-item">
+                    <label>Activation Link:</label>
+                    <div className="credential-value">
+                      <code className="link-code">{generatedPassword.activation_link}</code>
+                      <button
+                        className="btn-icon btn-copy"
+                        onClick={() => copyToClipboard(generatedPassword.activation_link)}
+                        title="Copy"
+                      >
+                        <i className="fas fa-copy"></i>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="alert alert-warning" style={{ marginTop: '20px' }}>
+                  <i className="fas fa-exclamation-triangle"></i>
+                  <p><strong>Important:</strong> Save these credentials securely. The password will not be shown again. The user must activate their account via email before they can log in.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-actions">
+              <button className="btn btn-primary" onClick={closeAllModals}>
+                <i className="fas fa-check"></i>
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Edit User Modal */}
       {showEditModal && selectedUser && (
         <div className="modal-overlay" onClick={closeAllModals}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2><i className="fas fa-user-edit"></i> Edit User</h2>
+              <h2>
+                <i className="fas fa-user-edit"></i> Edit User
+              </h2>
               <button className="modal-close" onClick={closeAllModals}>
                 <i className="fas fa-times"></i>
               </button>
@@ -779,7 +901,9 @@ const UserManagement = () => {
                 {error && (
                   <div className="alert alert-error">
                     <i className="fas fa-exclamation-circle"></i>
-                    <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
+                    <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>
+                      {error}
+                    </pre>
                   </div>
                 )}
 
@@ -796,7 +920,9 @@ const UserManagement = () => {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Email <span className="required">*</span></label>
+                    <label>
+                      Email <span className="required">*</span>
+                    </label>
                     <input
                       type="email"
                       name="email"
@@ -845,7 +971,9 @@ const UserManagement = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Role <span className="required">*</span></label>
+                  <label>
+                    Role <span className="required">*</span>
+                  </label>
                   <select
                     name="role"
                     value={formData.role}
@@ -853,8 +981,10 @@ const UserManagement = () => {
                     required
                   >
                     <option value="">Select Role</option>
-                    {roles.map(role => (
-                      <option key={role.id} value={role.id}>{role.name}</option>
+                    {roles.map((role) => (
+                      <option key={role.id} value={role.id}>
+                        {role.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -923,9 +1053,14 @@ const UserManagement = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && selectedUser && (
         <div className="modal-overlay" onClick={closeAllModals}>
-          <div className="modal-content modal-small" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-content modal-small"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h2><i className="fas fa-trash-alt"></i> Delete User</h2>
+              <h2>
+                <i className="fas fa-trash-alt"></i> Delete User
+              </h2>
               <button className="modal-close" onClick={closeAllModals}>
                 <i className="fas fa-times"></i>
               </button>
@@ -940,14 +1075,23 @@ const UserManagement = () => {
               )}
 
               <p className="confirm-message">
-                Are you sure you want to delete <strong>{selectedUser.full_name || selectedUser.username}</strong>?
-                This will deactivate the account.
+                Are you sure you want to delete{" "}
+                <strong>
+                  {selectedUser.full_name || selectedUser.username}
+                </strong>
+                ? This will deactivate the account.
               </p>
 
               <div className="user-summary">
-                <p><strong>Username:</strong> {selectedUser.username}</p>
-                <p><strong>Email:</strong> {selectedUser.email}</p>
-                <p><strong>Role:</strong> {selectedUser.role_name}</p>
+                <p>
+                  <strong>Username:</strong> {selectedUser.username}
+                </p>
+                <p>
+                  <strong>Email:</strong> {selectedUser.email}
+                </p>
+                <p>
+                  <strong>Role:</strong> {selectedUser.role_name}
+                </p>
               </div>
             </div>
 
@@ -984,9 +1128,14 @@ const UserManagement = () => {
       {/* Reset Password Modal */}
       {showPasswordModal && selectedUser && (
         <div className="modal-overlay" onClick={closeAllModals}>
-          <div className="modal-content modal-small" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-content modal-small"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h2><i className="fas fa-key"></i> Reset Password</h2>
+              <h2>
+                <i className="fas fa-key"></i> Reset Password
+              </h2>
               <button className="modal-close" onClick={closeAllModals}>
                 <i className="fas fa-times"></i>
               </button>
@@ -997,16 +1146,23 @@ const UserManagement = () => {
                 {error && (
                   <div className="alert alert-error">
                     <i className="fas fa-exclamation-circle"></i>
-                    <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
+                    <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>
+                      {error}
+                    </pre>
                   </div>
                 )}
 
                 <p className="info-message">
-                  Reset password for <strong>{selectedUser.full_name || selectedUser.username}</strong>
+                  Reset password for{" "}
+                  <strong>
+                    {selectedUser.full_name || selectedUser.username}
+                  </strong>
                 </p>
 
                 <div className="form-group">
-                  <label>New Password <span className="required">*</span></label>
+                  <label>
+                    New Password <span className="required">*</span>
+                  </label>
                   <input
                     type="password"
                     name="new_password"
@@ -1016,11 +1172,15 @@ const UserManagement = () => {
                     minLength={8}
                     placeholder="Enter new password"
                   />
-                  <small>Min 8 characters, include uppercase, lowercase, and digit</small>
+                  <small>
+                    Min 8 characters, include uppercase, lowercase, and digit
+                  </small>
                 </div>
 
                 <div className="form-group">
-                  <label>Confirm New Password <span className="required">*</span></label>
+                  <label>
+                    Confirm New Password <span className="required">*</span>
+                  </label>
                   <input
                     type="password"
                     name="new_password_confirm"
@@ -1070,7 +1230,9 @@ const UserManagement = () => {
         <div className="modal-overlay" onClick={closeAllModals}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2><i className="fas fa-user"></i> User Details</h2>
+              <h2>
+                <i className="fas fa-user"></i> User Details
+              </h2>
               <button className="modal-close" onClick={closeAllModals}>
                 <i className="fas fa-times"></i>
               </button>
@@ -1080,7 +1242,10 @@ const UserManagement = () => {
               <div className="user-detail-container">
                 <div className="user-detail-avatar">
                   {selectedUser.profile_picture ? (
-                    <img src={`${BACKEND_URL}${selectedUser.profile_picture}`} alt={selectedUser.username} />
+                    <img
+                      src={`${BACKEND_URL}${selectedUser.profile_picture}`}
+                      alt={selectedUser.username}
+                    />
                   ) : (
                     <div className="avatar-placeholder">
                       <i className="fas fa-user"></i>
@@ -1091,11 +1256,15 @@ const UserManagement = () => {
                 <div className="user-detail-info">
                   <div className="detail-row">
                     <span className="detail-label">Username:</span>
-                    <span className="detail-value">{selectedUser.username}</span>
+                    <span className="detail-value">
+                      {selectedUser.username}
+                    </span>
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Full Name:</span>
-                    <span className="detail-value">{selectedUser.full_name || '-'}</span>
+                    <span className="detail-value">
+                      {selectedUser.full_name || "-"}
+                    </span>
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Email:</span>
@@ -1103,36 +1272,48 @@ const UserManagement = () => {
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Phone:</span>
-                    <span className="detail-value">{selectedUser.phone || '-'}</span>
+                    <span className="detail-value">
+                      {selectedUser.phone || "-"}
+                    </span>
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Role:</span>
                     <span className="detail-value">
-                      <span className={`role-badge role-${selectedUser.role_name?.toLowerCase()}`}>
+                      <span
+                        className={`role-badge role-${selectedUser.role_name?.toLowerCase()}`}
+                      >
                         {selectedUser.role_name}
                       </span>
                     </span>
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Status:</span>
-                    <span className="detail-value">{getStatusBadge(selectedUser.is_active)}</span>
+                    <span className="detail-value">
+                      {getStatusBadge(selectedUser.is_active)}
+                    </span>
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Staff Status:</span>
-                    <span className="detail-value">{selectedUser.is_staff ? 'Yes' : 'No'}</span>
+                    <span className="detail-value">
+                      {selectedUser.is_staff ? "Yes" : "No"}
+                    </span>
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Date Joined:</span>
                     <span className="detail-value">
-                      {new Date(selectedUser.date_joined).toLocaleString('en-GB')}
+                      {new Date(selectedUser.date_joined).toLocaleString(
+                        "en-GB"
+                      )}
                     </span>
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Last Login:</span>
                     <span className="detail-value">
-                      {selectedUser.last_login 
-                        ? new Date(selectedUser.last_login).toLocaleString('en-GB')
-                        : 'Never'}
+                      {selectedUser.last_login
+                        ? new Date(selectedUser.last_login).toLocaleString(
+                            "en-GB"
+                          )
+                        : "Never"}
                     </span>
                   </div>
                 </div>
@@ -1143,10 +1324,13 @@ const UserManagement = () => {
               <button className="btn btn-secondary" onClick={closeAllModals}>
                 Close
               </button>
-              <button className="btn btn-primary" onClick={() => {
-                closeAllModals();
-                setTimeout(() => openEditModal(selectedUser), 100);
-              }}>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  closeAllModals();
+                  setTimeout(() => openEditModal(selectedUser), 100);
+                }}
+              >
                 <i className="fas fa-edit"></i>
                 Edit User
               </button>

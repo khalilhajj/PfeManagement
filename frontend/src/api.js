@@ -456,3 +456,7 @@ export const assignFinalGrade = async (reportId, finalGrade) => {
   );
   return response.data;
 };
+export const activationAccount = async (token) => {
+  const response = await API.get(`/auth/activate/${token}/`);
+  return response.data;
+};

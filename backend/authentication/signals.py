@@ -17,8 +17,10 @@ def create_default_user(sender, **kwargs):
         admin_role = Role.objects.get(name='Administrator')
         user, created = User.objects.get_or_create(
             username='admin',
-            email='admin@admin.com',
-            role=admin_role
+            email='khalil.hajri@esen.tn',
+            role=admin_role,
+            
+
         )
         if created:
             user.set_password('admin')
