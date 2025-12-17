@@ -25,16 +25,13 @@ urlpatterns = [
     path('student/', include('report.urls')),
     path('internship/', include('internship.urls')),
 
-    # JWT authentication endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    # Swagger documentation
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),
 
-    #Internships
     path('internship/', include('internship.urls')),
     path('administrator/', include('administrator.urls')),
 

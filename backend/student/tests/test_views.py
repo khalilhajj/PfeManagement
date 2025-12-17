@@ -6,7 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APIClient
 from rest_framework import status
 
-from student.models import Report
+from report.models import Report
 
 pytestmark = pytest.mark.django_db
 

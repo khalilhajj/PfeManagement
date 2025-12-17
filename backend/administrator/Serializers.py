@@ -1,7 +1,10 @@
+from administrator.utils import generate_secure_password, generate_activation_token, send_activation_email
 from rest_framework import serializers
 from authentication.models import User, Role
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.core.validators import EmailValidator
+from django.utils import timezone
 
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,8 +19,8 @@ class UserListSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
-            'phone', 'profile_picture', 'role', 'role_name',
-            'is_active', 'date_joined'
+            'phone', 'profile_picture', 'role', 'role_name','is_enabled'
+            , 'is_active', 'date_joined'
         ]
         read_only_fields = ['date_joined']
 
@@ -29,39 +32,37 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
-            'phone', 'profile_picture', 'role', 'role_name',
-            'is_active', 'is_staff', 'date_joined', 'last_login'
+            'phone', 'profile_picture', 'role', 'role_name','is_enabled', 'is_active', 'is_staff', 'date_joined', 'last_login'
         ]
         read_only_fields = ['date_joined', 'last_login']
 
 class UserCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating new users"""
-    password = serializers.CharField(
-        write_only=True,
+    email = serializers.EmailField(
         required=True,
-        style={'input_type': 'password'},
-        min_length=8
-    )
-    password_confirm = serializers.CharField(
-        write_only=True,
-        required=True,
-        style={'input_type': 'password'}
+        validators=[EmailValidator(message="Enter a valid email address.")]
     )
     
     class Meta:
         model = User
         fields = [
-            'username', 'email', 'password', 'password_confirm',
-            'first_name', 'last_name', 'phone', 'profile_picture',
-            'role', 'is_active'
+            'username', 'email', 'first_name', 'last_name', 
+            'phone', 'profile_picture', 'role'
         ]
+        extra_kwargs = {
+            'first_name': {'required': True},
+            'last_name': {'required': True},
+        }
     
     def validate_username(self, value):
         """Validate username uniqueness and format"""
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError("Username already exists.")
         
-        if not value.isalnum() and '_' not in value:
+        if len(value) < 3:
+            raise serializers.ValidationError("Username must be at least 3 characters.")
+        
+        if not value.replace('_', '').isalnum():
             raise serializers.ValidationError(
                 "Username can only contain letters, numbers, and underscores."
             )
@@ -69,39 +70,49 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return value.lower()
     
     def validate_email(self, value):
-        """Validate email uniqueness and format"""
+        """Validate email uniqueness"""
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("Email already exists.")
         
         return value.lower()
     
-    def validate_password(self, value):
-        """Validate password strength"""
-        try:
-            validate_password(value)
-        except ValidationError as e:
-            raise serializers.ValidationError(list(e.messages))
-        
+    def validate_phone(self, value):
+        """Validate phone number"""
+        if value:
+            cleaned = value.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+            if not cleaned.replace('+', '').isdigit():
+                raise serializers.ValidationError("Phone number must contain only digits.")
+            if len(cleaned) < 8:
+                raise serializers.ValidationError("Phone number must be at least 8 digits.")
         return value
     
-    def validate(self, attrs):
-        """Validate password confirmation"""
-        if attrs['password'] != attrs['password_confirm']:
-            raise serializers.ValidationError({
-                "password_confirm": "Passwords do not match."
-            })
-        
-        return attrs
     
     def create(self, validated_data):
-        """Create user with hashed password"""
-        validated_data.pop('password_confirm')
-        password = validated_data.pop('password')
+        """Create user with auto-generated password and send activation email"""
+        password = generate_secure_password()
         
-        user = User.objects.create_user(
-            password=password,
-            **validated_data
+        user = User.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            role=validated_data.get('role'),
+            phone=validated_data.get('phone', ''),
+            is_enabled=False,
+            is_active=True,
         )
+        if 'profile_picture' in validated_data:
+            user.profile_picture = validated_data['profile_picture']
+        user.set_password(password)
+        
+        user.activation_token = generate_activation_token()
+        user.activation_token_created = timezone.now()
+        user.save()
+        email_sent = send_activation_email(user, password)
+        
+        if not email_sent:
+            print(f"Warning: Failed to send activation email to {user.email}")
+        user._generated_password = password
         
         return user
 

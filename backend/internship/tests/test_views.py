@@ -36,15 +36,17 @@ def role_admin():
 # --------- USERS ---------
 
 @pytest.fixture
-def student_user(role_student):
+def student_user(role_student, db):
     User = get_user_model()
-    u = User.objects.create_user(
-        username="student",
-        email="student@example.com",
-        password="StudentPass123!",
-        first_name="Stu",
-        last_name="Dent",
-        is_active=True,
+    u, _ = User.objects.get_or_create(
+        username="internship_student",
+        defaults={
+            "email": "internship_student@example.com",
+            "password": "StudentPass123!",
+            "first_name": "Stu",
+            "last_name": "Dent",
+            "is_active": True,
+        }
     )
     u.role = role_student
     u.save()
@@ -52,15 +54,17 @@ def student_user(role_student):
 
 
 @pytest.fixture
-def teacher_user(role_teacher):
+def teacher_user(role_teacher, db):
     User = get_user_model()
-    u = User.objects.create_user(
-        username="teacher",
-        email="teacher@example.com",
-        password="TeacherPass123!",
-        first_name="Tea",
-        last_name="Cher",
-        is_active=True,
+    u, _ = User.objects.get_or_create(
+        username="internship_teacher",
+        defaults={
+            "email": "internship_teacher@example.com",
+            "password": "TeacherPass123!",
+            "first_name": "Tea",
+            "last_name": "Cher",
+            "is_active": True,
+        }
     )
     u.role = role_teacher
     u.save()
@@ -68,15 +72,17 @@ def teacher_user(role_teacher):
 
 
 @pytest.fixture
-def admin_user(role_admin):
+def admin_user(role_admin, db):
     User = get_user_model()
-    u = User.objects.create_user(
-        username="admin",
-        email="admin@example.com",
-        password="AdminPass123!",
-        first_name="Ad",
-        last_name="Min",
-        is_active=True,
+    u, _ = User.objects.get_or_create(
+        username="internship_admin",
+        defaults={
+            "email": "internship_admin@example.com",
+            "password": "AdminPass123!",
+            "first_name": "Ad",
+            "last_name": "Min",
+            "is_active": True,
+        }
     )
     u.role = role_admin
     u.save()
@@ -84,17 +90,20 @@ def admin_user(role_admin):
 
 
 @pytest.fixture
-def other_user():
+def other_user(db):
     """Authenticated user with no special role (or wrong role)."""
     User = get_user_model()
-    return User.objects.create_user(
-        username="other",
-        email="other@example.com",
-        password="OtherPass123!",
-        first_name="Oth",
-        last_name="Er",
-        is_active=True,
+    u, _ = User.objects.get_or_create(
+        username="internship_other",
+        defaults={
+            "email": "internship_other@example.com",
+            "password": "OtherPass123!",
+            "first_name": "Oth",
+            "last_name": "Er",
+            "is_active": True,
+        }
     )
+    return u
 
 
 # --------- FILE & INTERNSHIP HELPERS ---------

@@ -15,11 +15,13 @@ import PendingInvitation from "./pages/teacher/PendingInvitation";
 import UserManagement from "./pages/administrator/UserManagement";
 import TeacherReportReview from "./pages/teacher/TeacherReportView";
 import StudentReports from "./pages/student/StudentReports";
+import ActivateAccount from "./Components/AuthComponent/ActivateAccount";
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
     children: [
       { path: "/", element: <Login /> },
+      {path: "/activate/:token", element: <ActivateAccount /> },
       {
         element: <ProtectedRoute allowedRoles={["Student"]} />,
         children: [

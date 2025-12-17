@@ -50,27 +50,22 @@ class ListUsersView(APIView):
         }
     )
     def get(self, request):
-        # Check if user is an administrator
         if not request.user.role or request.user.role.name != 'Administrator':
             return Response({
                 'error': 'Only administrators can view users.'
             }, status=status.HTTP_403_FORBIDDEN)
         
-        # Get all users
         users = User.objects.all().select_related('role')
         
-        # Filter by role
         role_id = request.query_params.get('role')
         if role_id:
             users = users.filter(role_id=role_id)
         
-        # Filter by active status
         is_active = request.query_params.get('is_active')
         if is_active is not None:
             is_active_bool = is_active.lower() in ['true', '1', 'yes']
             users = users.filter(is_active=is_active_bool)
         
-        # Search
         search = request.query_params.get('search')
         if search:
             users = users.filter(
@@ -80,7 +75,6 @@ class ListUsersView(APIView):
                 Q(last_name__icontains=search)
             )
         
-        # Order by date joined (newest first)
         users = users.order_by('-date_joined')
         
         serializer = UserListSerializer(users, many=True)
@@ -119,20 +113,34 @@ class GetUserDetailView(APIView):
 
 
 class CreateUserView(APIView):
-    """Create a new user"""
+    """Create a new user - generates password and sends activation email"""
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
     
     @swagger_auto_schema(
         request_body=UserCreateSerializer,
         responses={
-            201: UserDetailSerializer,
+            201: openapi.Response(
+                description="User created successfully",
+                examples={
+                    "application/json": {
+                        "message": "User created successfully. Activation email sent.",
+                        "data": {
+                            "id": 1,
+                            "username": "john_doe",
+                            "email": "john@example.com",
+                            "is_enabled": False
+                        },
+                        "generated_password": "TempPass123!"
+                    }
+                }
+            ),
             400: 'Bad Request',
             403: 'Forbidden'
         }
     )
     def post(self, request):
-        # Check if user is an administrator
+        # Check if user is administrator
         if not request.user.role or request.user.role.name != 'Administrator':
             return Response({
                 'error': 'Only administrators can create users.'
@@ -142,10 +150,19 @@ class CreateUserView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             detail_serializer = UserDetailSerializer(user)
-            return Response({
-                'message': 'User created successfully.',
-                'data': detail_serializer.data
-            }, status=status.HTTP_201_CREATED)
+            
+            response_data = {
+                'message': f'User created successfully. Activation email sent to {user.email}',
+                'data': detail_serializer.data,
+                'activation_sent': True
+            }
+            
+            # Include generated password for admin to see (IMPORTANT)
+            if hasattr(user, '_generated_password'):
+                response_data['generated_password'] = user._generated_password
+                response_data['activation_link'] = f"{request.scheme}://{request.get_host()}/activate/{user.activation_token}"
+            
+            return Response(response_data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

@@ -2,8 +2,8 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from student.models import Report
-from student.serializer import ReportSerializer
+from report.models import Report
+from report.serializer import ReportSerializer
 
 pytestmark = pytest.mark.django_db
 
