@@ -2,7 +2,7 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from student.models import Report
+from report.models import Report
 
 pytestmark = pytest.mark.django_db
 

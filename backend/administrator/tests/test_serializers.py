@@ -85,13 +85,10 @@ def test_user_create_serializer_success(admin_role):
     data = {
         "username": "newuser",
         "email": "newuser@example.com",
-        "password": "StrongPass123!",
-        "password_confirm": "StrongPass123!",
         "first_name": "New",
         "last_name": "User",
         "phone": "123456789",
         "role": admin_role.id,
-        "is_active": True,
     }
 
     serializer = UserCreateSerializer(data=data)
@@ -104,20 +101,21 @@ def test_user_create_serializer_success(admin_role):
     assert user.username == "newuser"
     assert user.email == "newuser@example.com"
     assert user.role == admin_role
-    # password hashed
-    assert user.check_password("StrongPass123!")
+    # password auto-generated and stored in _generated_password
+    assert hasattr(user, '_generated_password')
+    assert user.check_password(user._generated_password)
+    # user is not enabled by default (requires activation)
+    assert user.is_enabled == False
+    assert user.activation_token is not None
 
 
 def test_user_create_serializer_username_unique(admin_role, user):
     data = {
         "username": "testuser",  # already used by fixture 'user'
         "email": "other@example.com",
-        "password": "StrongPass123!",
-        "password_confirm": "StrongPass123!",
         "first_name": "X",
         "last_name": "Y",
         "role": admin_role.id,
-        "is_active": True,
     }
 
     serializer = UserCreateSerializer(data=data)
@@ -127,37 +125,30 @@ def test_user_create_serializer_username_unique(admin_role, user):
 
 def test_user_create_serializer_email_unique(admin_role, user):
     data ={
-        "username": "anotheruser",
-        "email": "testuser@example.com",  # already used by fixture 'user'
-        "password": "StrongPass123!",
-        "password_confirm": "StrongPass123!",
+        "username": "otheruser",
+        "email": "testuser@example.com",  # already used by fixture
         "first_name": "X",
         "last_name": "Y",
         "role": admin_role.id,
-        "is_active": True,
     }
 
     serializer = UserCreateSerializer(data=data)
     assert not serializer.is_valid()
     assert "email" in serializer.errors
 
-
-def test_user_create_serializer_password_mismatch(admin_role):
+def test_user_create_serializer_missing_required_fields(admin_role):
+    """Test that creating user without required fields fails"""
     data = {
         "username": "user3",
         "email": "user3@example.com",
-        "password": "StrongPass123!",
-        "password_confirm": "WrongPass123!",
-        "first_name": "X",
-        "last_name": "Y",
+        # Missing first_name and last_name which are required
         "role": admin_role.id,
-        "is_active": True,
     }
 
     serializer = UserCreateSerializer(data=data)
     assert not serializer.is_valid()
-    # Field-level validation error under 'password_confirm'
-    assert "password_confirm" in serializer.errors or "__all__" in serializer.errors
+    assert "first_name" in serializer.errors
+    assert "last_name" in serializer.errors
 
 
 
