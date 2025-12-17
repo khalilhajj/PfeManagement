@@ -21,6 +21,7 @@ class User(AbstractUser):
     activation_token = models.CharField(max_length=255, blank=True, null=True, unique=True)
     activation_token_created = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    last_login_time = models.DateTimeField(blank=True, null=True)
   
     def __str__(self):
         return self.username

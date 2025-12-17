@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.utils import timezone
 from authentication.serializers.LoginSerializer import LoginSerializer
 from authentication.serializers.UserSerializer import UserSerializer
 from authentication.serializers.ChangePasswordSerializer import ChangePasswordSerializer
@@ -24,6 +25,10 @@ class LoginView(APIView):
             return Response({
                 'error': 'Your account is not activated yet. Please check your email for the activation link.'
             }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Update last login time
+        user.last_login_time = timezone.now()
+        user.save(update_fields=['last_login_time'])
                
         refresh = RefreshToken.for_user(user)
         token = user.get_token()
