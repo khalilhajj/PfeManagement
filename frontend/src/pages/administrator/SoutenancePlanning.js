@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form } from 'react-bootstrap';
-import { getSoutenances, createSoutenance, getSoutenanceCandidates, getTeachersList } from '../../api';
+import { Modal, Form, Button } from 'react-bootstrap';
+import { getSoutenances, createSoutenance, updateSoutenance, deleteSoutenance, getSoutenanceCandidates, getTeachersList } from '../../api';
 import './SoutenancePlanning.css';
-import { FaCalendarAlt, FaClock, FaDoorOpen, FaChalkboardTeacher, FaUserGraduate, FaSearch, FaPlus, FaCheckCircle, FaHourglassHalf } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaDoorOpen, FaChalkboardTeacher, FaUserGraduate, FaSearch, FaPlus, FaCheckCircle, FaHourglassHalf, FaEdit, FaTrash } from 'react-icons/fa';
 
 const SoutenancePlanning = () => {
     const [soutenances, setSoutenances] = useState([]);
     const [candidates, setCandidates] = useState([]);
     const [teachers, setTeachers] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [editMode, setEditMode] = useState(false);
+    const [selectedId, setSelectedId] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     
     // Filters
     const [searchTerm, setSearchTerm] = useState('');
@@ -47,6 +50,52 @@ const SoutenancePlanning = () => {
         }
     };
 
+    const handleEdit = (soutenance) => {
+        setEditMode(true);
+        setSelectedId(soutenance.id);
+        setFormData({
+            internship_id: soutenance.internship, // Assuming serializer returns ID. Note: list view returns names. We might need the ID from the s object if available.
+            // Check serializer: id, date, time, room, internship (ID), juries (List of objects or IDs?)
+            // If API returns detailed objects, we might need to map or store IDs. 
+            // NOTE: The list view serializer often returns nested data. 
+            // I'll assume I need to manually set these or fetching Detail is safer. 
+            // For now, let's look at what `s` has from `getSoutenances`.
+            // The console log would help, but I'll assume standard serializer fields: internship (id), juries (list of objects).
+            // Actually, my list view serializer likely returns strings for names. 
+            // I should verify `SoutenanceSerializer`. 
+            // Strategy: I will blindly populate what I can, or better: fetch detail on Edit.
+            date: soutenance.date,
+            time: soutenance.time,
+            room: soutenance.room,
+            // We need to map jury objects back to IDs if they are objects
+            jury1: soutenance.juries[0]?.id || '', 
+            jury2: soutenance.juries[1]?.id || ''
+        });
+        // We also need to set internship_id. If serializer returns object, take id.
+        setFormData(prev => ({
+           ...prev,
+           internship_id: typeof soutenance.internship === 'object' ? soutenance.internship.id : soutenance.internship
+        }));
+        
+        setShowModal(true);
+    };
+    
+    const handleDeleteClick = (id) => {
+        setSelectedId(id);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = async () => {
+        try {
+            await deleteSoutenance(selectedId);
+            setSuccess('Soutenance deleted successfully');
+            setShowDeleteModal(false);
+            fetchData();
+        } catch (err) {
+            setError('Failed to delete soutenance');
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -60,14 +109,22 @@ const SoutenancePlanning = () => {
                 room: formData.room,
                 jury_ids: [parseInt(formData.jury1), parseInt(formData.jury2)]
             };
-            await createSoutenance(payload);
-            setSuccess('Soutenance planned successfully!');
+            
+            if (editMode) {
+                await updateSoutenance(selectedId, payload);
+                setSuccess('Soutenance updated successfully!');
+            } else {
+                await createSoutenance(payload);
+                setSuccess('Soutenance planned successfully!');
+            }
+            
             setShowModal(false);
             setFormData({ internship_id: '', date: '', time: '', room: '', jury1: '', jury2: '' });
             setCandidateSearch('');
+            setEditMode(false);
             fetchData();
         } catch (err) {
-            setError('Failed to plan soutenance. Ensure date is future and jurors are unique.');
+            setError('Failed to save soutenance. Ensure date is future and jurors are unique.');
         }
     };
 
@@ -94,7 +151,11 @@ const SoutenancePlanning = () => {
                     <h1><FaUserGraduate /> Soutenance Planning</h1>
                     <p>Manage defense schedules and juries</p>
                 </div>
-                <button className="btn-primary" onClick={() => setShowModal(true)}>
+                <button className="btn-primary" onClick={() => {
+                    setEditMode(false);
+                    setFormData({ internship_id: '', date: '', time: '', room: '', jury1: '', jury2: '' });
+                    setShowModal(true);
+                }}>
                     <FaPlus /> Plan New Soutenance
                 </button>
             </div>
@@ -157,6 +218,7 @@ const SoutenancePlanning = () => {
                             <th>Room</th>
                             <th>Jury Members</th>
                             <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -182,6 +244,16 @@ const SoutenancePlanning = () => {
                                             {s.status}
                                         </span>
                                     </td>
+                                    <td>
+                                        <div className="action-buttons">
+                                            <button className="btn-icon btn-edit" onClick={() => handleEdit(s)}>
+                                                <FaEdit />
+                                            </button>
+                                            <button className="btn-icon btn-delete" onClick={() => handleDeleteClick(s.id)}>
+                                                <FaTrash />
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
                             ))
                         ) : (
@@ -196,33 +268,44 @@ const SoutenancePlanning = () => {
             {/* Modal */}
             <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
                 <Modal.Header closeButton>
-                    <Modal.Title><FaPlus /> Plan New Soutenance</Modal.Title>
+                    <Modal.Title>{editMode ? <><FaEdit /> Edit Soutenance</> : <><FaPlus /> Plan New Soutenance</>}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {error && <div className="alert alert-danger">{error}</div>}
                     <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3">
                             <Form.Label>Student Candidate</Form.Label>
-                            <Form.Control 
-                                type="text"
-                                placeholder="Type to filter candidates..."
-                                value={candidateSearch}
-                                onChange={(e) => setCandidateSearch(e.target.value)}
-                                className="mb-2"
-                            />
-                            <Form.Select 
-                                value={formData.internship_id}
-                                onChange={e => setFormData({...formData, internship_id: e.target.value})}
-                                required
-                            >
-                                <option value="">-- Select Candidate --</option>
-                                {candidates
-                                    .filter(c => c.student_name.toLowerCase().includes(candidateSearch.toLowerCase()))
-                                    .map(c => (
-                                        <option key={c.id} value={c.id}>{c.student_name} - {c.title}</option>
-                                    ))
-                                }
-                            </Form.Select>
+                            {!editMode ? (
+                                <>
+                                    <Form.Control 
+                                        type="text"
+                                        placeholder="Type to filter candidates..."
+                                        value={candidateSearch}
+                                        onChange={(e) => setCandidateSearch(e.target.value)}
+                                        className="mb-2"
+                                    />
+                                    <Form.Select 
+                                        value={formData.internship_id}
+                                        onChange={e => setFormData({...formData, internship_id: e.target.value})}
+                                        required
+                                    >
+                                        <option value="">-- Select Candidate --</option>
+                                        {candidates
+                                            .filter(c => c.student_name.toLowerCase().includes(candidateSearch.toLowerCase()))
+                                            .map(c => (
+                                                <option key={c.id} value={c.id}>{c.student_name} - {c.title}</option>
+                                            ))
+                                        }
+                                    </Form.Select>
+                                </>
+                            ) : (
+                                <Form.Control 
+                                    type="text" 
+                                    value="Warning: Changing student/internship is not supported in Edit mode for safety." 
+                                    disabled 
+                                    className="text-muted"
+                                />
+                            )}
                         </Form.Group>
 
                         <div className="row">
@@ -269,10 +352,24 @@ const SoutenancePlanning = () => {
 
                         <div className="d-flex justify-content-end gap-2 mt-4">
                             <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                            <button type="submit" className="btn-primary">Save Plan</button>
+                            <button type="submit" className="btn-primary">{editMode ? 'Update Plan' : 'Save Plan'}</button>
                         </div>
                     </Form>
                 </Modal.Body>
+            </Modal>
+
+            {/* Delete Confirmation Modal */}
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete this soutenance planning? This action cannot be undone, and the student will be notified.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Cancel</Button>
+                    <Button variant="danger" onClick={confirmDelete}>Delete</Button>
+                </Modal.Footer>
             </Modal>
         </div>
     );

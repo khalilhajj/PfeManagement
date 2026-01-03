@@ -69,9 +69,7 @@ class SoutenanceListCreateView(generics.ListCreateAPIView):
             
         return Soutenance.objects.none()
 
-class SoutenanceDetailView(generics.RetrieveUpdateAPIView):
-    # Only Admin can update (e.g., reschedule)
-    # Read-only for others
+class SoutenanceDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Soutenance.objects.all()
     serializer_class = SoutenanceSerializer
     
@@ -79,6 +77,39 @@ class SoutenanceDetailView(generics.RetrieveUpdateAPIView):
         if self.request.method in ['PUT', 'PATCH', 'DELETE']:
              return [permissions.IsAuthenticated(), IsAdminUser()]
         return [permissions.IsAuthenticated()]
+
+    def perform_update(self, serializer):
+        soutenance = serializer.save()
+        channel_layer = get_channel_layer()
+        
+        # Notify Student
+        student = soutenance.internship.student_id
+        msg = f"Your soutenance schedule has been updated to {soutenance.date} at {soutenance.time} in room {soutenance.room}."
+        Notification.objects.create(recipient=student, message=msg)
+        async_to_sync(channel_layer.group_send)(f"user_{student.id}", {"type": "send_notification", "message": msg})
+        
+        # Notify Jury
+        for jury in soutenance.juries.all():
+            msg_jury = f"The soutenance for {student.first_name} has been rescheduled to {soutenance.date} at {soutenance.time}."
+            Notification.objects.create(recipient=jury.member, message=msg_jury)
+            async_to_sync(channel_layer.group_send)(f"user_{jury.member.id}", {"type": "send_notification", "message": msg_jury})
+
+    def perform_destroy(self, instance):
+        channel_layer = get_channel_layer()
+        student = instance.internship.student_id
+        
+        # Notify Student
+        msg = f"Your soutenance scheduled for {instance.date} has been CANCELLED."
+        Notification.objects.create(recipient=student, message=msg)
+        async_to_sync(channel_layer.group_send)(f"user_{student.id}", {"type": "send_notification", "message": msg})
+        
+        # Notify Jury
+        for jury in instance.juries.all():
+            msg_jury = f"The soutenance for {student.first_name} scheduled for {instance.date} has been CANCELLED."
+            Notification.objects.create(recipient=jury.member, message=msg_jury)
+            async_to_sync(channel_layer.group_send)(f"user_{jury.member.id}", {"type": "send_notification", "message": msg_jury})
+            
+        instance.delete()
 
 
 class GetSoutenanceCandidatesView(generics.ListAPIView):

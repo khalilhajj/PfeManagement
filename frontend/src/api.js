@@ -503,3 +503,17 @@ export const createSoutenance = async (data) => {
   });
   return response.data;
 };
+
+export const updateSoutenance = async (id, data) => {
+  const response = await API.put(`/internship/soutenances/${id}/`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const deleteSoutenance = async (id) => {
+  const response = await API.delete(`/internship/soutenances/${id}/`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
