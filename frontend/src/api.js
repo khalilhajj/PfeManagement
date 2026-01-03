@@ -460,3 +460,46 @@ export const activationAccount = async (token) => {
   const response = await API.get(`/auth/activate/${token}/`);
   return response.data;
 };
+
+export const getSoutenances = async () => {
+  const response = await API.get("/internship/soutenances/", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const getSoutenanceCandidates = async () => {
+  const response = await API.get("/internship/soutenances/candidates/", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+// Notification APIs
+export const getNotifications = async () => {
+  const response = await API.get("/internship/notifications/", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const markNotificationRead = async (id) => {
+  const response = await API.patch(`/internship/notifications/${id}/read/`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const markAllNotificationsRead = async () => {
+  const response = await API.post("/internship/notifications/read-all/", {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const createSoutenance = async (data) => {
+  const response = await API.post("/internship/soutenances/", data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};

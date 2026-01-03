@@ -22,6 +22,12 @@ export const TeacherSidebarData = [
     cName: "nav-text",
   },
   {
+    title: "My Soutenances",
+    path: "/teacher-soutenances",
+    icon: <AiIcons.AiFillCalendar />,
+    cName: "nav-text",
+  },
+  {
     title: "Profile",
     path: "/profile",
     icon: <AiIcons.AiOutlineUser />,

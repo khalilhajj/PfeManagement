@@ -7,8 +7,8 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.shortcuts import get_object_or_404
 
-from .models import Internship, TeacherInvitation
-from .serializers import (
+from ..models import Internship, TeacherInvitation
+from ..serializers import (
     InternshipSerializer,
     TeacherInvitationSerializer,
     TeacherListSerializer

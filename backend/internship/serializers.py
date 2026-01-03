@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Internship, TeacherInvitation
+from .models import Internship, TeacherInvitation, Notification
 from authentication.models import User
 import os
 
@@ -144,3 +144,9 @@ class TeacherListSerializer(serializers.ModelSerializer):
     def get_full_name(self, obj):
         """Get full name of user"""
         return f"{obj.first_name} {obj.last_name}".strip() or obj.username
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'recipient', 'message', 'is_read', 'created_at']
+        read_only_fields = ['recipient', 'created_at']
