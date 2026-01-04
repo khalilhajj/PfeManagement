@@ -37,6 +37,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     #'django.contrib.admin',
+    'daphne',
+    'channels',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -127,6 +129,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'PfeManagement.wsgi.application'
+ASGI_APPLICATION = 'PfeManagement.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/0')],
+        },
+    },
+}
 
 
 # Database

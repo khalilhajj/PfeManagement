@@ -14,14 +14,17 @@ def create_default_roles(sender, **kwargs):
 @receiver(post_migrate)
 def create_default_user(sender, **kwargs):
     if sender.name == 'authentication':
-        admin_role = Role.objects.get(name='Administrator')
-        user, created = User.objects.get_or_create(
-            username='admin',
-            email='khalil.hajri@esen.tn',
-            role=admin_role,
-            
-
-        )
-        if created:
-            user.set_password('admin')
-            user.save()
+        try:
+            admin_role = Role.objects.get(name='Administrator')
+            user, created = User.objects.get_or_create(
+                username='admin',
+                defaults={
+                    'email': 'khalil.hajri@esen.tn',
+                    'role': admin_role
+                }
+            )
+            if created:
+                user.set_password('admin')
+                user.save()
+        except Exception:
+            pass

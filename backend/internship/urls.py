@@ -11,8 +11,11 @@ from .views import (
     ApproveInternshipView,
     RejectInternshipView,
     GetTeacherInvitationsView,
-
+    NotificationListView, 
+    MarkNotificationReadView, 
+    MarkAllNotificationsReadView
 )
+from .views.soutenance_views import SoutenanceListCreateView, SoutenanceDetailView, GetSoutenanceCandidatesView
 
 urlpatterns = [
     path('create/', CreateInternshipView.as_view(), name='create-internship'),
@@ -26,5 +29,12 @@ urlpatterns = [
     path('admin/<int:id>/approve/', ApproveInternshipView.as_view(), name='approve-internship'),
     path('admin/<int:id>/reject/', RejectInternshipView.as_view(), name='reject-internship'),
     path('teacher/invitations/', GetTeacherInvitationsView.as_view(), name='teacher-invitations'),
-
+    path('soutenances/', SoutenanceListCreateView.as_view(), name='soutenance-list'),
+    path('soutenances/candidates/', GetSoutenanceCandidatesView.as_view(), name='soutenance-candidates'),
+    path('soutenances/<int:pk>/', SoutenanceDetailView.as_view(), name='soutenance-detail'),
+    
+    # Notifications
+    path('notifications/', NotificationListView.as_view(), name='notification-list'),
+    path('notifications/<int:pk>/read/', MarkNotificationReadView.as_view(), name='notification-read'),
+    path('notifications/read-all/', MarkAllNotificationsReadView.as_view(), name='notification-read-all'),
 ]

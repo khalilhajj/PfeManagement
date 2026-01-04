@@ -16,6 +16,9 @@ import UserManagement from "./pages/administrator/UserManagement";
 import TeacherReportReview from "./pages/teacher/TeacherReportView";
 import StudentReports from "./pages/student/StudentReports";
 import ActivateAccount from "./Components/AuthComponent/ActivateAccount";
+import SoutenancePlanning from "./pages/administrator/SoutenancePlanning";
+import MySoutenance from "./pages/MySoutenance";
+import CVAnalyzer from "./Components/CVAnalyzer/CVAnalyzer";
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
@@ -30,7 +33,11 @@ const router = createBrowserRouter([
       },
       {
         element: <ProtectedRoute allowedRoles={["Student"]} />,
-        children: [{ path: "/student/reports", element: <StudentReports /> }],
+        children: [
+          { path: "/student/reports", element: <StudentReports /> },
+          { path: "/my-soutenances", element: <MySoutenance /> },
+          { path: "/cv-analyzer", element: <CVAnalyzer /> }
+        ],
       },
       {
         element: <ProtectedRoute allowedRoles={["Teacher"]} />,
@@ -45,6 +52,7 @@ const router = createBrowserRouter([
             path: "/teacher/pending-reviews",
             element: <TeacherReportReview />,
           },
+          { path: "/teacher-soutenances", element: <MySoutenance /> },
         ],
       },
       {
@@ -73,7 +81,7 @@ const router = createBrowserRouter([
       },
       {
         element: <ProtectedRoute allowedRoles={["Administrator"]} />,
-        children: [{ path: "/user-management", element: <UserManagement /> }],
+        children: [{ path: "/user-management", element: <UserManagement /> }, { path: "/soutenance-planning", element: <SoutenancePlanning /> }],
       },
       {
         element: (

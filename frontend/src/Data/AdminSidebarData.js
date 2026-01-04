@@ -33,4 +33,10 @@ export const AdminSidebarData = [
     icon: <AiIcons.AiOutlineUserSwitch />,
     cName: "nav-text",
   },
+  {
+    title: "Soutenance Planning",
+    path: "/soutenance-planning",
+    icon: <AiIcons.AiFillCalendar />,
+    cName: "nav-text",
+  },
 ];

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getcurrentuser } from '../../api';
 import './CompanyDashboard.css';
 
 const CompanyDashboard = () => {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -34,7 +36,15 @@ const CompanyDashboard = () => {
       </div>
 
       <div className="dashboard-cards">
-        <div className="info-card company-card">
+        <div className="info-card company-card" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
+          <div className="card-icon">
+            <i className="fas fa-building"></i>
+          </div>
+          <h3>Company Profile</h3>
+          <p>Manage your company information</p>
+        </div>
+
+        <div className="info-card company-card" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
           <div className="card-icon">
             <i className="fas fa-plus-circle"></i>
           </div>
@@ -42,7 +52,7 @@ const CompanyDashboard = () => {
           <p>Create opportunities for talented students</p>
         </div>
 
-        <div className="info-card company-card">
+        <div className="info-card company-card" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
           <div className="card-icon">
             <i className="fas fa-inbox"></i>
           </div>
@@ -50,20 +60,12 @@ const CompanyDashboard = () => {
           <p>Review and manage student applications</p>
         </div>
 
-        <div className="info-card company-card">
+        <div className="info-card company-card" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
           <div className="card-icon">
             <i className="fas fa-users-cog"></i>
           </div>
-          <h3>Active Interns</h3>
-          <p>Monitor current internship programs</p>
-        </div>
-
-        <div className="info-card company-card">
-          <div className="card-icon">
-            <i className="fas fa-handshake"></i>
-          </div>
-          <h3>Partnerships</h3>
-          <p>Strengthen ties with educational institutions</p>
+          <h3>Settings</h3>
+          <p>Configure your preferences</p>
         </div>
       </div>
     </div>
