@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getcurrentuser } from '../../api';
 import './StudentDashboard.css';
 
 const StudentDashboard = () => {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -34,36 +36,36 @@ const StudentDashboard = () => {
       </div>
 
       <div className="dashboard-cards">
-        <div className="info-card student-card">
+        <div className="info-card student-card" onClick={() => navigate('/cv-analyzer')} style={{ cursor: 'pointer' }}>
           <div className="card-icon">
-            <i className="fas fa-search"></i>
+            <i className="fas fa-file-text"></i>
           </div>
-          <h3>Find Internships</h3>
-          <p>Explore exciting opportunities from top companies</p>
+          <h3>CV Analyzer</h3>
+          <p>Get AI-powered feedback on your CV</p>
         </div>
 
-        <div className="info-card student-card">
+        <div className="info-card student-card" onClick={() => navigate('/my-soutenances')} style={{ cursor: 'pointer' }}>
           <div className="card-icon">
-            <i className="fas fa-file-alt"></i>
+            <i className="fas fa-calendar"></i>
           </div>
-          <h3>My Applications</h3>
-          <p>Track your internship applications and status</p>
+          <h3>My Soutenance</h3>
+          <p>View your defense schedule and details</p>
         </div>
 
-        <div className="info-card student-card">
+        <div className="info-card student-card" onClick={() => navigate('/student/reports')} style={{ cursor: 'pointer' }}>
           <div className="card-icon">
             <i className="fas fa-book"></i>
           </div>
-          <h3>Reports</h3>
+          <h3>My Reports</h3>
           <p>Submit and manage your internship reports</p>
         </div>
 
-        <div className="info-card student-card">
+        <div className="info-card student-card" onClick={() => navigate('/archieved-reports')} style={{ cursor: 'pointer' }}>
           <div className="card-icon">
-            <i className="fas fa-star"></i>
+            <i className="fas fa-archive"></i>
           </div>
-          <h3>Progress</h3>
-          <p>Monitor your academic achievements</p>
+          <h3>Archived Reports</h3>
+          <p>Access your past reports and submissions</p>
         </div>
       </div>
     </div>

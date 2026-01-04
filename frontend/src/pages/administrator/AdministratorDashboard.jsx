@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getcurrentuser } from '../../api';
 import './AdministratorDashboard.css';
 
 const AdministratorDashboard = () => {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -34,7 +36,7 @@ const AdministratorDashboard = () => {
       </div>
 
       <div className="dashboard-cards">
-        <div className="info-card admin-card">
+        <div className="info-card admin-card" onClick={() => navigate('/user-management')} style={{ cursor: 'pointer' }}>
           <div className="card-icon">
             <i className="fas fa-users"></i>
           </div>
@@ -42,7 +44,7 @@ const AdministratorDashboard = () => {
           <p>Oversee students, teachers, and company accounts</p>
         </div>
 
-        <div className="info-card admin-card">
+        <div className="info-card admin-card" onClick={() => navigate('/pending-internships')} style={{ cursor: 'pointer' }}>
           <div className="card-icon">
             <i className="fas fa-briefcase"></i>
           </div>
@@ -50,20 +52,20 @@ const AdministratorDashboard = () => {
           <p>Review and approve internship applications</p>
         </div>
 
-        <div className="info-card admin-card">
+        <div className="info-card admin-card" onClick={() => navigate('/soutenance-planning')} style={{ cursor: 'pointer' }}>
           <div className="card-icon">
             <i className="fas fa-chart-line"></i>
           </div>
-          <h3>Analytics</h3>
-          <p>Track performance and generate reports</p>
+          <h3>Soutenance Planning</h3>
+          <p>Plan and manage defense schedules</p>
         </div>
 
-        <div className="info-card admin-card">
+        <div className="info-card admin-card" onClick={() => navigate('/archieved-reports')} style={{ cursor: 'pointer' }}>
           <div className="card-icon">
-            <i className="fas fa-cog"></i>
+            <i className="fas fa-archive"></i>
           </div>
-          <h3>System Settings</h3>
-          <p>Configure platform preferences</p>
+          <h3>Archived Reports</h3>
+          <p>View historical internship reports</p>
         </div>
       </div>
     </div>

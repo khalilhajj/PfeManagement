@@ -30,3 +30,16 @@ flower==2.0.1
 channels==4.0.0
 daphne==4.0.0
 channels-redis==4.1.0
+
+# CV Analysis with LLaMA 2 (CPU-only, no GPU required)
+numpy<2
+pinecone-client==5.0.1
+langchain==0.3.20
+langchain-community==0.3.19
+langchain-pinecone==0.2.0
+pypdf==5.2.0
+replicate==0.34.1
+sentence-transformers==2.7.0
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.2.0+cpu
+torchaudio==2.2.0+cpu

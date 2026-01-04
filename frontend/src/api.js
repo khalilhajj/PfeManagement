@@ -48,6 +48,22 @@ export const updateUserProfile = async (userData) => {
   return response.data;
 };
 
+export const analyzeCv = async (cvFile) => {
+  const token = localStorage.getItem("accessToken");
+  if (!token) throw new Error("No access token found");
+  
+  const formData = new FormData();
+  formData.append('cv_file', cvFile);
+  
+  const response = await API.post('student/cv/analyze/', formData, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
 export const changePassword = async (passwordData) => {
   const token = localStorage.getItem("accessToken");
   if (!token) throw new Error("No access token found");
@@ -324,7 +340,7 @@ export const createReport = async (reportData) => {
     "Content-Type": isForm ? "multipart/form-data" : "application/json",
   };
 
-  const response = await API.post("/student/reports/create/", reportData, {
+  const response = await API.post("/report/reports/create/", reportData, {
     headers,
   });
   return response.data;
@@ -332,7 +348,7 @@ export const createReport = async (reportData) => {
 
 export const getMyReports = async () => {
   const token = localStorage.getItem("accessToken");
-  const response = await API.get("/student/reports/my-reports/", {
+  const response = await API.get("/report/reports/my-reports/", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -341,7 +357,7 @@ export const getMyReports = async () => {
 };
 
 export const getReportDetail = async (reportId) => {
-  const response = await API.get(`/student/reports/${reportId}/`, {
+  const response = await API.get(`/report/reports/${reportId}/`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -355,7 +371,7 @@ export const uploadReportVersion = async (reportId, file) => {
   formData.append("file", file);
 
   const response = await API.post(
-    `/student/reports/${reportId}/upload-version/`,
+    `/report/reports/${reportId}/upload-version/`,
     formData,
     {
       headers: {
@@ -369,7 +385,7 @@ export const uploadReportVersion = async (reportId, file) => {
 
 export const submitVersionForReview = async (versionId) => {
   const response = await API.post(
-    "/student/reports/versions/submit/",
+    "/report/reports/versions/submit/",
     { version_id: versionId },
     {
       headers: {
@@ -383,7 +399,7 @@ export const submitVersionForReview = async (versionId) => {
 
 // Teacher Review APIs
 export const getPendingVersions = async () => {
-  const response = await API.get("/student/reports/versions/pending/", {
+  const response = await API.get("/report/reports/versions/pending/", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -394,7 +410,7 @@ export const getPendingVersions = async () => {
 export const reviewVersion = async (versionId, action, isFinal = false, comment = "") => {
 
   const response = await API.post(
-    `/student/reports/versions/${versionId}/review/`,
+    `/report/reports/versions/${versionId}/review/`,
     {
       action,
       is_final: isFinal,
@@ -418,7 +434,7 @@ export const addComment = async (versionId, commentData) => {
   };
 
   const response = await API.post(
-    `/student/reports/versions/${versionId}/comment/`,
+    `/report/reports/versions/${versionId}/comment/`,
     commentData,
     {
       headers,
@@ -429,8 +445,9 @@ export const addComment = async (versionId, commentData) => {
 
 export const resolveComment = async (commentId) => {
   const response = await API.post(
-    `/student/reports/comments/${commentId}/resolve/`,
+    `/report/reports/comments/${commentId}/resolve/`,
     {},
+
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -443,7 +460,7 @@ export const resolveComment = async (commentId) => {
 
 export const assignFinalGrade = async (reportId, finalGrade) => {
   const response = await API.post(
-    `/student/reports/${reportId}/assign-grade/`,
+    `/report/reports/${reportId}/assign-grade/`,
     {
       final_grade: finalGrade,
     },
