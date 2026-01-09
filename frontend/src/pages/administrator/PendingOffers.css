@@ -194,11 +194,11 @@
 .btn-icon {
   background: #f0f0f0;
   border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   transition: background 0.2s;
 }
 
@@ -208,10 +208,11 @@
 
 .btn-action {
   border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
   font-weight: 600;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -303,9 +304,10 @@
 
 .btn-confirm {
   border: none;
-  padding: 0.6rem 1.25rem;
-  border-radius: 8px;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
   font-weight: 600;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -323,8 +325,9 @@
   background: #e9ecef;
   color: #495057;
   border: none;
-  padding: 0.6rem 1.25rem;
-  border-radius: 8px;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 

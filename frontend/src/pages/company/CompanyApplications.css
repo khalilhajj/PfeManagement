@@ -119,10 +119,11 @@
 .btn-slots {
   background: rgba(255, 255, 255, 0.2);
   color: white;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
   font-weight: 600;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -160,9 +161,10 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 0.5rem 1.25rem;
-  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
   font-weight: 600;
+  font-size: 0.85rem;
   cursor: pointer;
 }
 
@@ -313,17 +315,19 @@
 .btn-icon {
   background: #f0f0f0;
   border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 
 .btn-action {
   border: none;
-  padding: 0.4rem 0.75rem;
-  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
   font-weight: 600;
+  font-size: 0.75rem;
   cursor: pointer;
 }
 
@@ -356,9 +360,10 @@
 
 .btn-confirm {
   border: none;
-  padding: 0.6rem 1.25rem;
-  border-radius: 8px;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
   font-weight: 600;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 
@@ -370,8 +375,9 @@
   background: #e9ecef;
   color: #495057;
   border: none;
-  padding: 0.6rem 1.25rem;
-  border-radius: 8px;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 

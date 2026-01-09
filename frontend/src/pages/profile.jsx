@@ -278,14 +278,14 @@ const Profile = () => {
             </div>
 
             {error && (
-                <div className="alert alert-error">
+                <div className="alert alert-danger alert-dismissible fade show">
                     <i className="fas fa-exclamation-circle"></i>
                     {error}
                 </div>
             )}
 
             {successMessage && (
-                <div className="alert alert-success">
+                <div className="alert alert-success alert-dismissible fade show">
                     <i className="fas fa-check-circle"></i>
                     {successMessage}
                 </div>
@@ -501,14 +501,14 @@ const Profile = () => {
                         </div>
 
                         {passwordError && (
-                            <div className="alert alert-error">
+                            <div className="alert alert-danger alert-dismissible fade show">
                                 <i className="fas fa-exclamation-circle"></i>
                                 {passwordError}
                             </div>
                         )}
 
                         {passwordSuccess && (
-                            <div className="alert alert-success">
+                            <div className="alert alert-success alert-dismissible fade show">
                                 <i className="fas fa-check-circle"></i>
                                 {passwordSuccess}
                             </div>

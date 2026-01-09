@@ -118,14 +118,14 @@ const AddInternshipModal = ({ onClose, onSuccess }) => {
                 </div>
 
                 {error && (
-                    <div className="alert alert-error">
+                    <div className="alert alert-danger alert-dismissible fade show">
                         <i className="fas fa-exclamation-circle"></i>
                         {error}
                     </div>
                 )}
 
                 {successMessage && (
-                    <div className="alert alert-success">
+                    <div className="alert alert-success alert-dismissible fade show">
                         <i className="fas fa-check-circle"></i>
                         {successMessage}
                     </div>

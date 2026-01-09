@@ -141,16 +141,16 @@
 
 /* Buttons */
 .btn {
-    padding: 12px 30px;
+    padding: 8px 16px;
     border: none;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     text-decoration: none;
 }
 

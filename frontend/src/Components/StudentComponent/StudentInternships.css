@@ -28,6 +28,13 @@
     color: #667eea;
 }
 
+.section-header .btn {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    width: auto !important;
+    flex: 0 0 auto;
+}
+
 .section-description {
     color: #6c757d;
     font-size: 0.9rem;
@@ -73,11 +80,13 @@
 .empty-state .btn {
     background: white;
     color: #667eea;
+    padding: 8px 16px;
+    font-size: 0.85rem;
 }
 
 .empty-state .btn:hover {
     background: #f8f9fa;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 .internships-list {
@@ -275,44 +284,34 @@
     border-top: 1px solid #e9ecef;
 }
 
+
 .alert {
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 8px;
     display: flex;
     align-items: center;
     gap: 10px;
     animation: slideDown 0.3s ease;
 }
 
-.alert-error {
-    background-color: #fee;
-    color: #c00;
-    border: 1px solid #fcc;
-}
-
-.alert-success {
-    background-color: #efe;
-    color: #0a0;
-    border: 1px solid #cfc;
+.alert i {
+    flex-shrink: 0;
 }
 
 .btn {
-    padding: 10px 20px;
+    padding: 6px 12px;
     border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 600;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .btn-sm {
-    padding: 8px 16px;
-    font-size: 0.85rem;
+    padding: 5px 10px;
+    font-size: 0.75rem;
 }
 
 .btn-primary {
@@ -321,8 +320,8 @@
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.25);
 }
 
 .btn-primary:disabled {
