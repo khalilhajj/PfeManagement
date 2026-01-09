@@ -365,6 +365,16 @@ export const getReportDetail = async (reportId) => {
   return response.data;
 };
 
+export const deleteReport = async (reportId) => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.delete(`/report/reports/${reportId}/delete/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
 export const uploadReportVersion = async (reportId, file) => {
 
   const formData = new FormData();

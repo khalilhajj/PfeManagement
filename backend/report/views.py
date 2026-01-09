@@ -113,6 +113,61 @@ class GetReportDetailView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class DeleteReportView(APIView):
+    """Delete a report (only if it's a draft or has no approved versions)"""
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'id',
+                openapi.IN_PATH,
+                description="Report ID",
+                type=openapi.TYPE_INTEGER
+            )
+        ],
+        responses={
+            200: 'Report deleted successfully',
+            403: 'Forbidden',
+            404: 'Not Found'
+        }
+    )
+    def delete(self, request, id):
+        # Check if user is a student
+        if not request.user.role or request.user.role.name != 'Student':
+            return Response({
+                'error': 'Only students can delete reports.'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        report = get_object_or_404(Report, id=id)
+        
+        # Check if student owns this report
+        if report.student != request.user:
+            return Response({
+                'error': 'You don\'t have access to this report.'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        # Check if report is final (prevent deletion of graded reports)
+        if report.is_final:
+            return Response({
+                'error': 'Cannot delete a report that has been graded.'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        # Check if any version is approved
+        has_approved = report.versions.filter(status='approved').exists()
+        if has_approved:
+            return Response({
+                'error': 'Cannot delete a report with approved versions.'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        # Delete the report (cascade will delete versions and comments)
+        report.delete()
+        
+        return Response({
+            'message': 'Report deleted successfully.'
+        }, status=status.HTTP_200_OK)
+
+
 class UploadReportVersionView(APIView):
     """Upload a new version of a report"""
     permission_classes = [IsAuthenticated]

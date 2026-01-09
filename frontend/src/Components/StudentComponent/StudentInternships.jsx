@@ -58,7 +58,7 @@ const StudentInternships = () => {
                 text: 'Approved', 
                 class: 'status-approved',
                 icon: 'fas fa-check-circle',
-                description: 'Approved! You can now invite a teacher'
+                description: 'Approved!'
             },
             2: { 
                 text: 'Rejected', 
