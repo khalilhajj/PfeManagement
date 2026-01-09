@@ -30,7 +30,7 @@ class Internship(models.Model):
     )
     type = models.CharField(max_length=100)
     company_name = models.CharField(max_length=255)
-    cahier_de_charges = models.FileField(upload_to='cahiers_de_charges/')
+    cahier_de_charges = models.FileField(upload_to='cahiers_de_charges/', blank=True, null=True)
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     start_date = models.DateField()
     description = models.TextField(null=True, blank=True)
@@ -128,3 +128,125 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification for {self.recipient}: {self.message}"
+
+
+class InternshipOffer(models.Model):
+    """Internship offers posted by companies"""
+    STATUS_CHOICES = [
+        (0, 'Pending'),      # Waiting for admin approval
+        (1, 'Approved'),     # Admin approved, visible to students
+        (2, 'Rejected'),     # Admin rejected
+        (3, 'Closed'),       # Company closed the offer
+    ]
+    TYPE_CHOICES = [
+        ('PFE', 'Projet de Fin d\'Études'),
+        ('Stage', 'Stage'),
+        ('Internship', 'Internship'),
+    ]
+    
+    company = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='posted_offers'
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    requirements = models.TextField(blank=True, null=True)
+    type = models.CharField(max_length=100, choices=TYPE_CHOICES, default='Stage')
+    location = models.CharField(max_length=255, blank=True, null=True)
+    duration = models.CharField(max_length=100, blank=True, null=True)  # e.g., "3 months"
+    start_date = models.DateField()
+    end_date = models.DateField()
+    positions_available = models.IntegerField(default=1)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=0)
+    admin_feedback = models.TextField(blank=True, null=True)  # Reason for rejection
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.title} - {self.company.username}"
+
+    @property
+    def applications_count(self):
+        return self.applications.count()
+    
+    @property
+    def approved_applications_count(self):
+        return self.applications.filter(status=1).count()
+
+
+class InternshipApplication(models.Model):
+    """Student applications to internship offers"""
+    STATUS_CHOICES = [
+        (0, 'Pending'),           # Waiting for company review
+        (1, 'Interview'),         # Selected for interview
+        (2, 'Accepted'),          # Company accepted after interview
+        (3, 'Rejected'),          # Company rejected
+    ]
+    
+    offer = models.ForeignKey(
+        InternshipOffer,
+        on_delete=models.CASCADE,
+        related_name='applications'
+    )
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='internship_applications'
+    )
+    cover_letter = models.TextField(blank=True, null=True)
+    cv_file = models.FileField(upload_to='application_cvs/', blank=True, null=True)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=0)
+    company_feedback = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Interview-related fields
+    selected_interview_slot = models.ForeignKey(
+        'InterviewSlot',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='booked_application'
+    )
+    interview_notes = models.TextField(blank=True, null=True)  # Company notes after interview
+    
+    # Link to created internship when approved
+    created_internship = models.OneToOneField(
+        Internship,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='source_application'
+    )
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ['offer', 'student']  # One application per student per offer
+
+    def __str__(self):
+        return f"{self.student.username} -> {self.offer.title}"
+
+
+class InterviewSlot(models.Model):
+    """Available interview time slots created by companies"""
+    offer = models.ForeignKey(
+        InternshipOffer,
+        on_delete=models.CASCADE,
+        related_name='interview_slots'
+    )
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    location = models.CharField(max_length=255, blank=True, null=True)  # Room, Online link, etc.
+    is_booked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['date', 'start_time']
+
+    def __str__(self):
+        return f"{self.offer.title} - {self.date} {self.start_time}-{self.end_time}"

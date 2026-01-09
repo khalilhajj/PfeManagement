@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { StudentSidebarData } from "../../Data/StudentSidebarData";
 import { TeacherSidebarData } from "../../Data/TeacherSidebarData";
 import { AdminSidebarData } from "../../Data/AdminSidebarData";
+import { CompanySidebarData } from "../../Data/CompanySidebarData";
 import "../../App.css";
 import { IconContext } from "react-icons";
 import "./navbar.css";
@@ -203,6 +204,15 @@ function Navbar() {
               ))}
             {decodedToken.role_name === "Administrator" &&
               AdminSidebarData.map((item, index) => (
+                <li key={index} className={item.cName}>
+                  <Link to={item.path}>
+                    {item.icon}
+                    <span>{item.title}</span>
+                  </Link>
+                </li>
+              ))}
+            {decodedToken.role_name === "Company" &&
+              CompanySidebarData.map((item, index) => (
                 <li key={index} className={item.cName}>
                   <Link to={item.path}>
                     {item.icon}

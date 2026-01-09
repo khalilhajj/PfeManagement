@@ -1,0 +1,379 @@
+.pending-offers-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: #333;
+  font-size: 1.75rem;
+}
+
+.stats-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.stats-badge .count {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.stats-badge .label {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.filter-tabs button {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #e0e0e0;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.filter-tabs button.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: transparent;
+}
+
+.filter-tabs button:hover:not(.active) {
+  border-color: #667eea;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: #666;
+}
+
+/* Table Styles */
+.table-wrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.offers-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.offers-table th {
+  background: #f8f9fa;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #555;
+  border-bottom: 2px solid #e0e0e0;
+  white-space: nowrap;
+}
+
+.offers-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.offer-row:hover {
+  background: #fafbff;
+}
+
+.offer-row.status-0 {
+  border-left: 4px solid #ffc107;
+}
+
+.offer-row.status-1 {
+  border-left: 4px solid #28a745;
+}
+
+.offer-row.status-2 {
+  border-left: 4px solid #dc3545;
+}
+
+/* Company Cell */
+.company-cell .company-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.company-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.company-info strong {
+  display: block;
+  color: #333;
+}
+
+.company-info .email {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.title-cell strong {
+  color: #333;
+}
+
+.type-badge {
+  background: #e8ebff;
+  color: #667eea;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.center {
+  text-align: center;
+}
+
+/* Status Badge */
+.status-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-warning { background: #fff3cd; color: #856404; }
+.badge-success { background: #d4edda; color: #155724; }
+.badge-danger { background: #f8d7da; color: #721c24; }
+.badge-secondary { background: #e2e3e5; color: #383d41; }
+
+/* Action Buttons */
+.actions-cell .action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  background: #f0f0f0;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background 0.2s;
+}
+
+.btn-icon:hover {
+  background: #e0e0e0;
+}
+
+.btn-action {
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-action.approve {
+  background: #28a745;
+  color: white;
+}
+
+.btn-action.approve:hover {
+  background: #218838;
+}
+
+.btn-action.reject {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-action.reject:hover {
+  background: #c82333;
+}
+
+/* Expanded Row */
+.expanded-row td {
+  background: #f8f9fa;
+  padding: 0 !important;
+}
+
+.expanded-content {
+  padding: 1.5rem;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.detail-section h4 {
+  margin: 0 0 0.5rem 0;
+  color: #444;
+  font-size: 0.9rem;
+}
+
+.detail-section p {
+  margin: 0;
+  color: #555;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.admin-feedback {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #fff3cd;
+  border-radius: 8px;
+  color: #856404;
+}
+
+/* Form Row */
+.form-row td {
+  background: #fff9e6 !important;
+  padding: 0 !important;
+}
+
+.inline-form {
+  padding: 1.5rem;
+}
+
+.inline-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.inline-form textarea:focus {
+  border-color: #667eea;
+  outline: none;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-confirm {
+  border: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-confirm.reject {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-confirm.reject:hover {
+  background: #c82333;
+}
+
+.btn-cancel {
+  background: #e9ecef;
+  color: #495057;
+  border: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background: #dee2e6;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f0f0f0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .offers-table th,
+  .offers-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .filter-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .table-wrapper {
+    overflow-x: auto;
+  }
+}

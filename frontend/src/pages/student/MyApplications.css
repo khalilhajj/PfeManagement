@@ -1,0 +1,374 @@
+.my-applications-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: #333;
+}
+
+.subtitle {
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.empty-state h3 {
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.btn-browse {
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.applications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.application-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.application-card.status-0 {
+  border-left: 4px solid #ffc107;
+}
+
+.application-card.status-1 {
+  border-left: 4px solid #17a2b8;
+}
+
+.application-card.status-2 {
+  border-left: 4px solid #28a745;
+}
+
+.application-card.status-3 {
+  border-left: 4px solid #dc3545;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.offer-info {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.company-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #667eea;
+}
+
+.offer-info h3 {
+  margin: 0;
+  color: #333;
+}
+
+.company-name {
+  margin: 0.25rem 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.status-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.badge-info {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.badge-success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.app-details {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.detail-row .label {
+  font-weight: 600;
+  color: #555;
+  min-width: 100px;
+}
+
+/* Status messages */
+.status-message {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.status-message.pending {
+  background: #fff8e1;
+  border-left: 3px solid #ffc107;
+}
+
+.status-message.success {
+  background: #e8f5e9;
+  border-left: 3px solid #4caf50;
+}
+
+.status-message.rejected {
+  background: #ffebee;
+  border-left: 3px solid #f44336;
+}
+
+.status-message h4 {
+  margin: 0 0 0.5rem;
+  color: #333;
+}
+
+.status-message p {
+  margin: 0;
+  color: #555;
+}
+
+.feedback {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+}
+
+.encouragement {
+  margin-top: 0.75rem !important;
+  font-style: italic;
+  color: #888 !important;
+}
+
+/* Interview section */
+.interview-section {
+  margin-top: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #e3f2fd 0%, #e8f5e9 100%);
+  border-radius: 12px;
+}
+
+.interview-message {
+  margin-bottom: 1.5rem;
+}
+
+.interview-message h4 {
+  color: #1976d2;
+  margin: 0 0 0.5rem;
+}
+
+.interview-message p {
+  margin: 0;
+  color: #555;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.slot-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.slot-card:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+.slot-card.selected {
+  border-color: #667eea;
+  background: #f3e5f5;
+}
+
+.slot-date {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.slot-time {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.slot-location {
+  color: #888;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.no-slots-message {
+  background: #fff3cd;
+  padding: 1rem;
+  border-radius: 8px;
+  color: #856404;
+}
+
+.confirm-slot {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-cancel {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Interview scheduled */
+.interview-scheduled {
+  margin-top: 1rem;
+  padding: 1.5rem;
+  background: #e8f5e9;
+  border-radius: 12px;
+  border-left: 4px solid #4caf50;
+}
+
+.interview-scheduled h4 {
+  margin: 0 0 1rem;
+  color: #2e7d32;
+}
+
+.scheduled-details {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.scheduled-details p {
+  margin: 0.25rem 0;
+  color: #555;
+}
+
+.interview-tip {
+  margin: 0;
+  color: #666;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Documents */
+.app-documents {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.cv-link {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #e3f2fd;
+  color: #1976d2;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.cv-link:hover {
+  background: #bbdefb;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e0e0e0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
