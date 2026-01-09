@@ -363,14 +363,14 @@ const StudentReports = () => {
 
       {/* Alerts */}
       {error && (
-        <div className="alert alert-error">
+        <div className="alert alert-danger alert-dismissible fade show">
           <i className="fas fa-exclamation-circle"></i>
           <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
         </div>
       )}
 
       {successMessage && (
-        <div className="alert alert-success">
+        <div className="alert alert-success alert-dismissible fade show">
           <i className="fas fa-check-circle"></i>
           {successMessage}
         </div>
@@ -469,7 +469,7 @@ const StudentReports = () => {
             <form onSubmit={handleCreateReport}>
               <div className="modal-body">
                 {error && (
-                  <div className="alert alert-error">
+                  <div className="alert alert-danger alert-dismissible fade show">
                     <i className="fas fa-exclamation-circle"></i>
                     <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
                   </div>
@@ -575,7 +575,7 @@ const StudentReports = () => {
             <form onSubmit={handleUploadVersion}>
               <div className="modal-body">
                 {error && (
-                  <div className="alert alert-error">
+                  <div className="alert alert-danger alert-dismissible fade show">
                     <i className="fas fa-exclamation-circle"></i>
                     <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
                   </div>

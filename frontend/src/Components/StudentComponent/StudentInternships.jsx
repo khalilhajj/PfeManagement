@@ -113,7 +113,7 @@ const StudentInternships = () => {
                     <p className="section-description">Track and manage your internships</p>
                 </div>
                 <button 
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-primary btn-sm w-auto"
                     id="add-internship-button"
                     onClick={() => setShowAddModal(true)}
                 >
@@ -123,7 +123,7 @@ const StudentInternships = () => {
             </div>
 
             {error && (
-                <div className="alert alert-error">
+                <div className="alert alert-danger alert-dismissible fade show">
                     <i className="fas fa-exclamation-circle"></i>
                     {error}
                 </div>

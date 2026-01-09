@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getAdminPendingOffers, adminReviewOffer } from '../../api';
+import CustomModal from '../../Components/common/CustomModal';
 import './PendingOffers.css';
 
 const PendingOffers = () => {
@@ -9,6 +10,7 @@ const PendingOffers = () => {
   const [expandedId, setExpandedId] = useState(null);
   const [reviewingId, setReviewingId] = useState(null);
   const [feedback, setFeedback] = useState('');
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info', onConfirm: null });
 
   useEffect(() => {
     fetchOffers();
@@ -29,12 +31,12 @@ const PendingOffers = () => {
   const handleReview = async (offerId, status) => {
     try {
       await adminReviewOffer(offerId, status, feedback);
-      alert(status === 1 ? 'Offer approved!' : 'Offer rejected.');
+      setModal({ isOpen: true, title: status === 1 ? 'Offer Approved!' : 'Offer Rejected', message: status === 1 ? 'The internship offer has been approved successfully.' : 'The internship offer has been rejected.', type: status === 1 ? 'success' : 'info', onConfirm: null });
       setReviewingId(null);
       setFeedback('');
       fetchOffers();
     } catch (error) {
-      alert(error.response?.data?.error || 'Failed to review offer');
+      setModal({ isOpen: true, title: 'Review Failed', message: error.response?.data?.error || 'Failed to review offer', type: 'danger', onConfirm: null });
     }
   };
 
@@ -233,6 +235,14 @@ const PendingOffers = () => {
           </table>
         </div>
       )}
+      <CustomModal
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        onConfirm={modal.onConfirm}
+      />
     </div>
   );
 };

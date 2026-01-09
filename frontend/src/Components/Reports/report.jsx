@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getMyReports } from '../../api';
+import CustomModal from '../common/CustomModal';
 import './reports.css';
 
 const Report = () => {
@@ -8,6 +9,7 @@ const Report = () => {
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info', onConfirm: null });
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
     useEffect(() => {
@@ -335,7 +337,7 @@ const Report = () => {
                                                 const url = sanitizeUrl(report.approved_version.file);
                                                 if (url === '#') {
                                                     e.preventDefault();
-                                                    alert('Invalid file URL');
+                                                    setModal({ isOpen: true, title: 'Invalid File', message: 'The file URL is invalid and cannot be downloaded.', type: 'warning', onConfirm: null });
                                                 }
                                             }}
                                             aria-label={`Download ${report.title}`}
@@ -368,6 +370,14 @@ const Report = () => {
                     </div>
                 </div>
             )}
+            <CustomModal
+                isOpen={modal.isOpen}
+                title={modal.title}
+                message={modal.message}
+                type={modal.type}
+                onClose={() => setModal({ ...modal, isOpen: false })}
+                onConfirm={modal.onConfirm}
+            />
         </div>
     );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { browseInternshipOffers, applyToOffer, getMyApplications } from '../../api';
+import CustomModal from '../../Components/common/CustomModal';
 import './BrowseInternships.css';
 
 const BrowseInternships = () => {
@@ -9,6 +10,7 @@ const BrowseInternships = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [applyingTo, setApplyingTo] = useState(null);
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info', onConfirm: null });
   const [applicationData, setApplicationData] = useState({
     cover_letter: '',
     cv_file: null
@@ -51,7 +53,7 @@ const BrowseInternships = () => {
   const handleApply = async (offerId) => {
     // Validate CV is selected
     if (!applicationData.cv_file) {
-      alert('Please upload your CV/Resume to apply');
+      setModal({ isOpen: true, title: 'CV Required', message: 'Please upload your CV/Resume to apply for this internship.', type: 'warning', onConfirm: null });
       return;
     }
     
@@ -61,7 +63,7 @@ const BrowseInternships = () => {
         cover_letter: applicationData.cover_letter,
         cv_file: applicationData.cv_file
       });
-      alert('Application submitted successfully!');
+      setModal({ isOpen: true, title: 'Application Submitted!', message: 'Your application has been submitted successfully. Good luck!', type: 'success', onConfirm: null });
       setApplyingTo(null);
       setApplicationData({ cover_letter: '', cv_file: null });
       fetchData();
@@ -70,7 +72,7 @@ const BrowseInternships = () => {
                      error.response?.data?.error || 
                      error.response?.data?.offer?.[0] || 
                      'Failed to apply';
-      alert(errMsg);
+      setModal({ isOpen: true, title: 'Application Failed', message: errMsg, type: 'danger', onConfirm: null });
     }
   };
 
@@ -260,6 +262,14 @@ const BrowseInternships = () => {
           ))
         )}
       </div>
+      <CustomModal
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        onConfirm={modal.onConfirm}
+      />
     </div>
   );
 };

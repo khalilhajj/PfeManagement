@@ -8,6 +8,7 @@ import {
   createInterviewSlot,
   deleteInterviewSlot
 } from '../../api';
+import CustomModal from '../../Components/common/CustomModal';
 import './CompanyApplications.css';
 
 const CompanyApplications = () => {
@@ -20,6 +21,7 @@ const CompanyApplications = () => {
   const [decisionId, setDecisionId] = useState(null);
   const [feedback, setFeedback] = useState('');
   const [interviewNotes, setInterviewNotes] = useState('');
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info', onConfirm: null });
   
   // Inline slot management
   const [managingSlotsFor, setManagingSlotsFor] = useState(null);
@@ -72,25 +74,25 @@ const CompanyApplications = () => {
   const handleReview = async (applicationId, status) => {
     try {
       await reviewApplication(applicationId, status, feedback);
-      alert(status === 1 ? 'Student invited to interview!' : 'Application rejected.');
+      setModal({ isOpen: true, title: 'Success!', message: status === 1 ? 'Student invited to interview!' : 'Application rejected.', type: 'success', onConfirm: null });
       setReviewingId(null);
       setFeedback('');
       fetchData();
     } catch (error) {
-      alert(error.response?.data?.error || 'Failed to review application');
+      setModal({ isOpen: true, title: 'Error', message: error.response?.data?.error || 'Failed to review application', type: 'danger', onConfirm: null });
     }
   };
 
   const handleFinalDecision = async (applicationId, status) => {
     try {
       await interviewDecision(applicationId, status, interviewNotes, feedback);
-      alert(status === 2 ? 'Student accepted! Internship created.' : 'Application rejected after interview.');
+      setModal({ isOpen: true, title: 'Success!', message: status === 2 ? 'Student accepted! Internship created.' : 'Application rejected after interview.', type: 'success', onConfirm: null });
       setDecisionId(null);
       setFeedback('');
       setInterviewNotes('');
       fetchData();
     } catch (error) {
-      alert(error.response?.data?.error || 'Failed to make decision');
+      setModal({ isOpen: true, title: 'Error', message: error.response?.data?.error || 'Failed to make decision', type: 'danger', onConfirm: null });
     }
   };
 
@@ -101,18 +103,41 @@ const CompanyApplications = () => {
       setNewSlot({ date: '', start_time: '', end_time: '', location: '' });
       fetchSlots(offerId);
     } catch (error) {
-      alert(error.response?.data?.error || 'Failed to create slot');
+      setModal({ isOpen: true, title: 'Error', message: error.response?.data?.error || 'Failed to create slot', type: 'danger', onConfirm: null });
     }
   };
 
   const handleDeleteSlot = async (slotId, offerId) => {
-    if (!window.confirm('Delete this time slot?')) return;
-    try {
-      await deleteInterviewSlot(slotId);
-      fetchSlots(offerId);
-    } catch (error) {
-      alert(error.response?.data?.error || 'Failed to delete slot');
-    }
+    setModal({
+      isOpen: true,
+      title: 'Delete Time Slot',
+      message: 'Are you sure you want to delete this time slot?',
+      type: 'confirm',
+      onConfirm: async () => {
+        try {
+          await deleteInterviewSlot(slotId);
+          fetchSlots(offerId);
+        } catch (error) {
+          setModal({ isOpen: true, title: 'Error', message: error.response?.data?.error || 'Failed to delete slot', type: 'danger', onConfirm: null });
+        }
+      }
+    });
+  };
+
+  const handleRejectApplication = (appId, isAfterInterview = false) => {
+    setModal({
+      isOpen: true,
+      title: 'Reject Application',
+      message: 'Are you sure you want to reject this application?',
+      type: 'confirm',
+      onConfirm: () => {
+        if (isAfterInterview) {
+          handleFinalDecision(appId, 3);
+        } else {
+          handleReview(appId, 3);
+        }
+      }
+    });
   };
 
   const getStatusBadge = (status) => {
@@ -286,13 +311,13 @@ const CompanyApplications = () => {
                             {app.status === 0 && (
                               <>
                                 <button className="btn-action invite" onClick={() => setReviewingId(app.id)} title="Interview"></button>
-                                <button className="btn-action reject" onClick={() => { if(window.confirm('Reject?')) handleReview(app.id, 3); }} title="Reject"></button>
+                                <button className="btn-action reject" onClick={() => handleRejectApplication(app.id, false)} title="Reject"></button>
                               </>
                             )}
                             {app.status === 1 && app.selected_slot_info && (
                               <>
                                 <button className="btn-action accept" onClick={() => setDecisionId(app.id)} title="Accept"></button>
-                                <button className="btn-action reject" onClick={() => { if(window.confirm('Reject?')) handleFinalDecision(app.id, 3); }} title="Reject"></button>
+                                <button className="btn-action reject" onClick={() => handleRejectApplication(app.id, true)} title="Reject"></button>
                               </>
                             )}
                           </div>
@@ -348,6 +373,16 @@ const CompanyApplications = () => {
           </div>
         ))
       )}
+
+      <CustomModal
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        onConfirm={modal.onConfirm}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        confirmText={modal.type === 'confirm' ? 'Yes, Proceed' : 'OK'}
+      />
     </div>
   );
 };

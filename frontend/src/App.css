@@ -129,3 +129,19 @@
 span {
   margin-left: 16px;
 }
+
+/* Global Button Overrides - Prevent Bootstrap stretching */
+.btn {
+  width: auto !important;
+  flex: 0 0 auto !important;
+}
+
+.btn.btn-primary,
+.btn.btn-secondary,
+.btn.btn-success,
+.btn.btn-danger,
+.btn.btn-warning,
+.btn.btn-info {
+  width: auto !important;
+  max-width: fit-content;
+}

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { getMyApplications, selectInterviewSlot } from '../../api';
+import CustomModal from '../../Components/common/CustomModal';
 import './MyApplications.css';
 
 const MyApplications = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectingSlot, setSelectingSlot] = useState(null);
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info', onConfirm: null });
 
   useEffect(() => {
     fetchApplications();
@@ -25,11 +27,11 @@ const MyApplications = () => {
   const handleSelectSlot = async (applicationId, slotId) => {
     try {
       await selectInterviewSlot(applicationId, slotId);
-      alert('Interview time slot confirmed!');
+      setModal({ isOpen: true, title: 'Interview Scheduled!', message: 'Your interview time slot has been confirmed. Good luck!', type: 'success', onConfirm: null });
       setSelectingSlot(null);
       fetchApplications();
     } catch (error) {
-      alert(error.response?.data?.error || 'Failed to select slot');
+      setModal({ isOpen: true, title: 'Scheduling Failed', message: error.response?.data?.error || 'Failed to select slot', type: 'danger', onConfirm: null });
     }
   };
 
@@ -214,6 +216,14 @@ const MyApplications = () => {
           ))}
         </div>
       )}
+      <CustomModal
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        onConfirm={modal.onConfirm}
+      />
     </div>
   );
 };

@@ -303,14 +303,14 @@ const TeacherReportReview = () => {
 
       {/* Alerts */}
       {error && (
-        <div className="alert alert-error">
+        <div className="alert alert-danger alert-dismissible fade show">
           <i className="fas fa-exclamation-circle"></i>
           <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
         </div>
       )}
 
       {successMessage && (
-        <div className="alert alert-success">
+        <div className="alert alert-success alert-dismissible fade show">
           <i className="fas fa-check-circle"></i>
           {successMessage}
         </div>
@@ -417,7 +417,7 @@ const TeacherReportReview = () => {
             <form onSubmit={handleReviewSubmit}>
               <div className="modal-body">
                 {error && (
-                  <div className="alert alert-error">
+                  <div className="alert alert-danger alert-dismissible fade show">
                     <i className="fas fa-exclamation-circle"></i>
                     <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
                   </div>
@@ -517,7 +517,7 @@ const TeacherReportReview = () => {
             <form onSubmit={handleCommentSubmit}>
               <div className="modal-body">
                 {error && (
-                  <div className="alert alert-error">
+                  <div className="alert alert-danger alert-dismissible fade show">
                     <i className="fas fa-exclamation-circle"></i>
                     <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
                   </div>
@@ -616,14 +616,14 @@ const TeacherReportReview = () => {
             <form onSubmit={handleGradeSubmit}>
               <div className="modal-body">
                 {error && (
-                  <div className="alert alert-error">
+                  <div className="alert alert-danger alert-dismissible fade show">
                     <i className="fas fa-exclamation-circle"></i>
                     <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
                   </div>
                 )}
 
                 {!selectedReport.is_final && (
-                  <div className="alert alert-warning">
+                  <div className="alert alert-warning alert-dismissible fade show">
                     <i className="fas fa-exclamation-triangle"></i>
                     Warning: This report is not marked as final yet.
                   </div>

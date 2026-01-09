@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getCompanyOffers, createInternshipOffer, deleteInternshipOffer } from '../../api';
+import CustomModal from '../../Components/common/CustomModal';
 import './PostInternship.css';
 
 const PostInternship = () => {
@@ -8,6 +9,7 @@ const PostInternship = () => {
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info', onConfirm: null });
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -45,7 +47,7 @@ const PostInternship = () => {
     setSubmitting(true);
     try {
       await createInternshipOffer(formData);
-      alert('Internship offer created! Waiting for admin approval.');
+      setModal({ isOpen: true, title: 'Success!', message: 'Internship offer created! Waiting for admin approval.', type: 'success', onConfirm: null });
       setShowForm(false);
       setFormData({
         title: '',
@@ -60,21 +62,27 @@ const PostInternship = () => {
       });
       fetchOffers();
     } catch (error) {
-      alert(error.response?.data?.error || 'Failed to create offer');
+      setModal({ isOpen: true, title: 'Error', message: error.response?.data?.error || 'Failed to create offer', type: 'danger', onConfirm: null });
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (offerId) => {
-    if (window.confirm('Are you sure you want to delete this offer?')) {
-      try {
-        await deleteInternshipOffer(offerId);
-        fetchOffers();
-      } catch (error) {
-        alert('Failed to delete offer');
+    setModal({
+      isOpen: true,
+      title: 'Delete Offer',
+      message: 'Are you sure you want to delete this offer? This action cannot be undone.',
+      type: 'confirm',
+      onConfirm: async () => {
+        try {
+          await deleteInternshipOffer(offerId);
+          fetchOffers();
+        } catch (error) {
+          setModal({ isOpen: true, title: 'Error', message: 'Failed to delete offer', type: 'danger', onConfirm: null });
+        }
       }
-    }
+    });
   };
 
   const getStatusBadge = (status) => {
@@ -316,6 +324,16 @@ const PostInternship = () => {
           </div>
         )}
       </div>
+
+      <CustomModal
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        onConfirm={modal.onConfirm}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        confirmText={modal.type === 'confirm' ? 'Delete' : 'OK'}
+      />
     </div>
   );
 };
