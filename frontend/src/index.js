@@ -19,6 +19,15 @@ import ActivateAccount from "./Components/AuthComponent/ActivateAccount";
 import SoutenancePlanning from "./pages/administrator/SoutenancePlanning";
 import MySoutenance from "./pages/MySoutenance";
 import CVAnalyzer from "./Components/CVAnalyzer/CVAnalyzer";
+// Company pages
+import PostInternship from "./pages/company/PostInternship";
+import CompanyApplications from "./pages/company/CompanyApplications";
+// Student browse internships
+import BrowseInternships from "./pages/student/BrowseInternships";
+import MyApplications from "./pages/student/MyApplications";
+// Admin pending offers
+import PendingOffers from "./pages/administrator/PendingOffers";
+
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
@@ -29,6 +38,8 @@ const router = createBrowserRouter([
         element: <ProtectedRoute allowedRoles={["Student"]} />,
         children: [
           { path: "/student-dashboard", element: <StudentDashboard /> },
+          { path: "/browse-internships", element: <BrowseInternships /> },
+          { path: "/my-applications", element: <MyApplications /> },
         ],
       },
       {
@@ -65,6 +76,8 @@ const router = createBrowserRouter([
         element: <ProtectedRoute allowedRoles={["Company"]} />,
         children: [
           { path: "/company-dashboard", element: <CompanyDashboard /> },
+          { path: "/company/post-internship", element: <PostInternship /> },
+          { path: "/company/applications", element: <CompanyApplications /> },
         ],
       },
       {
@@ -77,6 +90,7 @@ const router = createBrowserRouter([
         element: <ProtectedRoute allowedRoles={["Administrator"]} />,
         children: [
           { path: "/pending-internships", element: <PendingInternships /> },
+          { path: "/pending-offers", element: <PendingOffers /> },
         ],
       },
       {
@@ -94,7 +108,7 @@ const router = createBrowserRouter([
       {
         element: (
           <ProtectedRoute
-            allowedRoles={["Administrator", "Teacher", "Student"]}
+            allowedRoles={["Administrator", "Teacher", "Student", "Company"]}
           />
         ),
         children: [{ path: "/profile", element: <Profile /> }],

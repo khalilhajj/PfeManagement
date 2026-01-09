@@ -10,6 +10,18 @@ export const StudentSidebarData = [
     cName: "nav-text",
   },
   {
+    title: "Browse Internships",
+    path: "/browse-internships",
+    icon: <AiIcons.AiOutlineSearch />,
+    cName: "nav-text",
+  },
+  {
+    title: "My Applications",
+    path: "/my-applications",
+    icon: <AiIcons.AiOutlineFileText />,
+    cName: "nav-text",
+  },
+  {
     title: "Archieved Reports",
     path: "/archieved-reports",
     icon: <AiIcons.AiFillEdit />,

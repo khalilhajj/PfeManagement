@@ -534,3 +534,216 @@ export const deleteSoutenance = async (id) => {
   });
   return response.data;
 };
+
+// ==================== COMPANY INTERNSHIP OFFERS ====================
+
+// Company: Get all my offers
+export const getCompanyOffers = async () => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.get("/internship/offers/", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+// Company: Create new offer
+export const createInternshipOffer = async (offerData) => {
+  const token = localStorage.getItem("accessToken");
+  const formData = new FormData();
+  Object.keys(offerData).forEach((key) => {
+    if (offerData[key] !== null && offerData[key] !== undefined) {
+      formData.append(key, offerData[key]);
+    }
+  });
+  const response = await API.post("/internship/offers/", formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
+// Company: Update offer
+export const updateInternshipOffer = async (offerId, offerData) => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.put(`/internship/offers/${offerId}/`, offerData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};
+
+// Company: Delete offer
+export const deleteInternshipOffer = async (offerId) => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.delete(`/internship/offers/${offerId}/`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+// Company: Get applications for an offer
+export const getOfferApplications = async (offerId) => {
+  const token = localStorage.getItem("accessToken");
+  const url = offerId 
+    ? `/internship/offers/${offerId}/applications/` 
+    : "/internship/offers/all-applications/";
+  const response = await API.get(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+// Company: Review application (approve/reject)
+export const reviewApplication = async (applicationId, status, feedback = "") => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.post(
+    `/internship/applications/${applicationId}/review/`,
+    { status, feedback },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
+// Company: Make final decision after interview (accept/reject)
+export const interviewDecision = async (applicationId, status, interviewNotes = "", feedback = "") => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.post(
+    `/internship/applications/${applicationId}/decision/`,
+    { status, interview_notes: interviewNotes, feedback },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
+// ==================== INTERVIEW SLOTS ====================
+
+// Company: Get interview slots for an offer
+export const getInterviewSlots = async (offerId) => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.get(`/internship/offers/${offerId}/slots/`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+// Company: Create interview slot
+export const createInterviewSlot = async (offerId, slotData) => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.post(
+    `/internship/offers/${offerId}/slots/`,
+    slotData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
+// Company: Delete interview slot
+export const deleteInterviewSlot = async (slotId) => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.delete(`/internship/slots/${slotId}/`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+// Student: Select interview time slot
+export const selectInterviewSlot = async (applicationId, slotId) => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.post(
+    `/internship/applications/${applicationId}/select-slot/`,
+    { slot_id: slotId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
+// ==================== STUDENT BROWSE & APPLY ====================
+
+// Student: Browse available offers
+export const browseInternshipOffers = async (filters = {}) => {
+  const token = localStorage.getItem("accessToken");
+  const params = new URLSearchParams(filters).toString();
+  const url = params ? `/internship/browse/?${params}` : "/internship/browse/";
+  const response = await API.get(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+// Student: Apply to an offer
+export const applyToOffer = async (applicationData) => {
+  const token = localStorage.getItem("accessToken");
+  const formData = new FormData();
+  Object.keys(applicationData).forEach((key) => {
+    if (applicationData[key] !== null && applicationData[key] !== undefined) {
+      formData.append(key, applicationData[key]);
+    }
+  });
+  const response = await API.post("/internship/apply/", formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
+// Student: Get my applications
+export const getMyApplications = async () => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.get("/internship/my-applications/", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+// ==================== ADMIN OFFER MANAGEMENT ====================
+
+// Admin: Get pending offers
+export const getAdminPendingOffers = async (status = 0) => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.get(`/internship/admin/offers/?status=${status}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+// Admin: Review offer (approve/reject)
+export const adminReviewOffer = async (offerId, status, feedback = "") => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.post(
+    `/internship/admin/offers/${offerId}/review/`,
+    { status, feedback },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};

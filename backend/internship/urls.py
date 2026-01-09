@@ -16,6 +16,21 @@ from .views import (
     MarkAllNotificationsReadView
 )
 from .views.soutenance_views import SoutenanceListCreateView, SoutenanceDetailView, GetSoutenanceCandidatesView
+from .views.company_views import (
+    CompanyOfferListCreateView,
+    CompanyOfferDetailView,
+    CompanyApplicationsView,
+    CompanyReviewApplicationView,
+    CompanyInterviewDecisionView,
+    InterviewSlotListCreateView,
+    InterviewSlotDeleteView,
+    BrowseOffersView,
+    StudentApplyView,
+    StudentApplicationsView,
+    StudentSelectInterviewSlotView,
+    AdminPendingOffersView,
+    AdminReviewOfferView
+)
 
 urlpatterns = [
     path('create/', CreateInternshipView.as_view(), name='create-internship'),
@@ -37,4 +52,26 @@ urlpatterns = [
     path('notifications/', NotificationListView.as_view(), name='notification-list'),
     path('notifications/<int:pk>/read/', MarkNotificationReadView.as_view(), name='notification-read'),
     path('notifications/read-all/', MarkAllNotificationsReadView.as_view(), name='notification-read-all'),
+    
+    # Company Internship Offers
+    path('offers/', CompanyOfferListCreateView.as_view(), name='company-offers'),
+    path('offers/<int:offer_id>/', CompanyOfferDetailView.as_view(), name='company-offer-detail'),
+    path('offers/<int:offer_id>/applications/', CompanyApplicationsView.as_view(), name='offer-applications'),
+    path('offers/all-applications/', CompanyApplicationsView.as_view(), name='all-applications'),
+    path('applications/<int:application_id>/review/', CompanyReviewApplicationView.as_view(), name='review-application'),
+    path('applications/<int:application_id>/decision/', CompanyInterviewDecisionView.as_view(), name='interview-decision'),
+    
+    # Interview Slots Management
+    path('offers/<int:offer_id>/slots/', InterviewSlotListCreateView.as_view(), name='interview-slots'),
+    path('slots/<int:slot_id>/', InterviewSlotDeleteView.as_view(), name='delete-slot'),
+    
+    # Student Browse & Apply
+    path('browse/', BrowseOffersView.as_view(), name='browse-offers'),
+    path('apply/', StudentApplyView.as_view(), name='apply-offer'),
+    path('my-applications/', StudentApplicationsView.as_view(), name='my-applications'),
+    path('applications/<int:application_id>/select-slot/', StudentSelectInterviewSlotView.as_view(), name='select-slot'),
+    
+    # Admin Review Offers
+    path('admin/offers/', AdminPendingOffersView.as_view(), name='admin-pending-offers'),
+    path('admin/offers/<int:offer_id>/review/', AdminReviewOfferView.as_view(), name='admin-review-offer'),
 ]
