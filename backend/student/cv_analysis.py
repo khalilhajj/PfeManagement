@@ -1,7 +1,4 @@
-"""
-CV Analysis using FREE Groq API (LLaMA 3)
-No credit card needed - completely free!
-"""
+
 import os
 import tempfile
 import requests
@@ -9,15 +6,6 @@ from langchain_community.document_loaders import PyPDFLoader
 
 
 def analyze_cv_with_llama(cv_file):
-    """
-    Analyzes a CV using FREE Groq API with LLaMA 3.
-    
-    Args:
-        cv_file: Django UploadedFile object
-        
-    Returns:
-        dict with 'keep', 'remove', 'improve' sections
-    """
     try:
         # Get Groq API key (FREE - no credit card needed)
         groq_api_key = os.environ.get('GROQ_API_KEY')
@@ -107,7 +95,6 @@ Be specific and reference actual content from the CV."""
                 
                 print("✅ Analysis completed!")
                 
-                # Parse the response
                 sections = parse_analysis_response(analysis_text)
                 
                 return {
@@ -136,7 +123,6 @@ Be specific and reference actual content from the CV."""
                 }
                 
         finally:
-            # Clean up temporary file
             if os.path.exists(tmp_file_path):
                 os.unlink(tmp_file_path)
                 
@@ -160,7 +146,6 @@ def parse_analysis_response(text):
     for line in text.split('\n'):
         line = line.strip()
         
-        # Detect section headers
         if 'KEEP:' in line.upper():
             current_section = 'keep'
             continue
@@ -171,18 +156,16 @@ def parse_analysis_response(text):
             current_section = 'improve'
             continue
         
-        # Parse bullet points
         if line and current_section:
             if line.startswith('-') or line.startswith('•') or line.startswith('*'):
                 cleaned = line.lstrip('-•* ').strip()
-                if cleaned and len(cleaned) > 10:  # Ignore very short items
+                if cleaned and len(cleaned) > 10:  
                     sections[current_section].append(cleaned)
-            elif line[0].isdigit() and '.' in line[:3]:  # Numbered list
+            elif line[0].isdigit() and '.' in line[:3]: 
                 cleaned = line.split('.', 1)[1].strip()
                 if cleaned and len(cleaned) > 10:
                     sections[current_section].append(cleaned)
     
-    # Ensure we have at least something in each section
     if not sections['keep']:
         sections['keep'] = [
             "Professional presentation and clear structure",

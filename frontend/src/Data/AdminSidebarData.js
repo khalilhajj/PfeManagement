@@ -28,6 +28,12 @@ export const AdminSidebarData = [
     cName: "nav-text",
   },
   {
+    title: "Company Offers",
+    path: "/pending-offers",
+    icon: <AiIcons.AiOutlineAudit />,
+    cName: "nav-text",
+  },
+  {
     title: "User Management",
     path: "/user-management",
     icon: <AiIcons.AiOutlineUserSwitch />,

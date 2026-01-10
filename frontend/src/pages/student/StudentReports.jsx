@@ -5,13 +5,16 @@ import {
   createReport,
   uploadReportVersion,
   submitVersionForReview,
-  resolveComment
+  resolveComment,
+  deleteReport,
+  getMyInternships
 } from '../../api';
 import './StudentReports.css';
 
 const StudentReports = () => {
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
+  const [internships, setInternships] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -19,6 +22,8 @@ const StudentReports = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [reportToDelete, setReportToDelete] = useState(null);
   
   const [actionLoading, setActionLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -55,6 +60,18 @@ const StudentReports = () => {
   const handleCreateInputChange = (e) => {
     const { name, value } = e.target;
     setCreateFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Auto-populate title when internship is selected
+    if (name === 'internship' && value) {
+      const selectedInternship = internships.find(int => int.id === parseInt(value));
+      if (selectedInternship && !createFormData.title) {
+        setCreateFormData(prev => ({
+          ...prev,
+          [name]: value,
+          title: `${selectedInternship.type} Report - ${selectedInternship.company_name}`
+        }));
+      }
+    }
   };
 
   const handleFileSelect = (e) => {
@@ -95,7 +112,22 @@ const StudentReports = () => {
       description: ''
     });
     setError('');
+    fetchInternships();
     setShowCreateModal(true);
+  };
+
+  const fetchInternships = async () => {
+    try {
+      const data = await getMyInternships();
+      // Filter for approved internships without reports
+      // status === 1 means approved
+      const availableInternships = data.filter(
+        int => int.status === 1 && !int.has_report
+      );
+      setInternships(availableInternships);
+    } catch (err) {
+      console.error('Failed to fetch internships:', err);
+    }
   };
 
   const openUploadModal = (report) => {
@@ -123,7 +155,9 @@ const StudentReports = () => {
     setShowCreateModal(false);
     setShowUploadModal(false);
     setShowDetailModal(false);
+    setShowDeleteModal(false);
     setSelectedReport(null);
+    setReportToDelete(null);
     setSelectedFile(null);
     setFilePreview(null);
     setError('');
@@ -206,10 +240,6 @@ const StudentReports = () => {
   };
 
   const handleSubmitForReview = async (versionId) => {
-    if (!window.confirm('Submit this version for teacher review?')) {
-      return;
-    }
-
     setActionLoading(true);
     setError('');
     setSuccessMessage('');
@@ -248,6 +278,32 @@ const StudentReports = () => {
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to resolve comment');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteReport = async (reportId, reportTitle) => {
+    setReportToDelete({ id: reportId, title: reportTitle });
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteReport = async () => {
+    if (!reportToDelete) return;
+
+    setActionLoading(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      const response = await deleteReport(reportToDelete.id);
+      setSuccessMessage(response.message || 'Report deleted successfully!');
+      await fetchReports();
+      closeAllModals();
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to delete report');
+      setShowDeleteModal(false);
     } finally {
       setActionLoading(false);
     }
@@ -307,14 +363,14 @@ const StudentReports = () => {
 
       {/* Alerts */}
       {error && (
-        <div className="alert alert-error">
+        <div className="alert alert-danger alert-dismissible fade show">
           <i className="fas fa-exclamation-circle"></i>
           <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
         </div>
       )}
 
       {successMessage && (
-        <div className="alert alert-success">
+        <div className="alert alert-success alert-dismissible fade show">
           <i className="fas fa-check-circle"></i>
           {successMessage}
         </div>
@@ -376,12 +432,22 @@ const StudentReports = () => {
                 </button>
                 
                 {!report.is_final && (
-                  <button
-                    className="btn btn-primary btn-sm"
-                    onClick={() => openUploadModal(report)}
-                  >
-                    <i className="fas fa-upload"></i> Upload Version
-                  </button>
+                  <>
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={() => openUploadModal(report)}
+                    >
+                      <i className="fas fa-upload"></i> Upload Version
+                    </button>
+                    
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDeleteReport(report.id, report.title)}
+                      disabled={actionLoading}
+                    >
+                      <i className="fas fa-trash"></i> Delete
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -403,23 +469,39 @@ const StudentReports = () => {
             <form onSubmit={handleCreateReport}>
               <div className="modal-body">
                 {error && (
-                  <div className="alert alert-error">
+                  <div className="alert alert-danger alert-dismissible fade show">
                     <i className="fas fa-exclamation-circle"></i>
                     <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
                   </div>
                 )}
 
                 <div className="form-group">
-                  <label>Internship ID <span className="required">*</span></label>
-                  <input
-                    type="number"
+                  <label>Select Internship <span className="required">*</span></label>
+                  <select
                     name="internship"
                     value={createFormData.internship}
                     onChange={handleCreateInputChange}
                     required
-                    placeholder="Enter internship ID"
-                  />
-                  <small>Enter the ID of your approved internship</small>
+                    disabled={internships.length === 0}
+                  >
+                    <option value="">-- Choose an internship --</option>
+                    {internships.length > 0 ? (
+                      internships.map(int => (
+                        <option key={int.id} value={int.id}>
+                          {int.title} - {int.company_name} ({int.type})
+                        </option>
+                      ))
+                    ) : (
+                      <option value="" disabled>No available internships</option>
+                    )}
+                  </select>
+                  {internships.length === 0 ? (
+                    <small style={{ color: '#dc3545' }}>
+                      <i className="fas fa-info-circle"></i> No available internships found. Make sure you have approved internships without reports.
+                    </small>
+                  ) : (
+                    <small>Select an approved internship without an existing report</small>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -493,7 +575,7 @@ const StudentReports = () => {
             <form onSubmit={handleUploadVersion}>
               <div className="modal-body">
                 {error && (
-                  <div className="alert alert-error">
+                  <div className="alert alert-danger alert-dismissible fade show">
                     <i className="fas fa-exclamation-circle"></i>
                     <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
                   </div>
@@ -794,6 +876,54 @@ const StudentReports = () => {
                   <i className="fas fa-upload"></i> Upload New Version
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && reportToDelete && (
+        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
+          <div className="modal-content modal-small" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2><i className="fas fa-exclamation-triangle" style={{ color: '#dc3545' }}></i> Delete Report</h2>
+              <button className="modal-close" onClick={() => setShowDeleteModal(false)}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <p style={{ marginBottom: '15px', fontSize: '1.05rem' }}>
+                Are you sure you want to delete <strong>"{reportToDelete.title}"</strong>?
+              </p>
+              <p style={{ color: '#dc3545', marginBottom: '0' }}>
+                <i className="fas fa-info-circle"></i> This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="modal-actions">
+              <button 
+                className="btn btn-secondary" 
+                onClick={() => setShowDeleteModal(false)}
+                disabled={actionLoading}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-danger" 
+                onClick={confirmDeleteReport}
+                disabled={actionLoading}
+              >
+                {actionLoading ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin"></i> Deleting...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-trash"></i> Delete Report
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

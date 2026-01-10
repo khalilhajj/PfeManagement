@@ -453,14 +453,14 @@ const UserManagement = () => {
 
       {/* Alerts */}
       {error && (
-        <div className="alert alert-error">
+        <div className="alert alert-danger alert-dismissible fade show">
           <i className="fas fa-exclamation-circle"></i>
           <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>{error}</pre>
         </div>
       )}
 
       {successMessage && (
-        <div className="alert alert-success">
+        <div className="alert alert-success alert-dismissible fade show">
           <i className="fas fa-check-circle"></i>
           {successMessage}
         </div>
@@ -624,13 +624,13 @@ const UserManagement = () => {
             <form onSubmit={handleCreate}>
               <div className="modal-body">
                 {error && (
-                  <div className="alert alert-error">
+                  <div className="alert alert-danger alert-dismissible fade show">
                     <i className="fas fa-exclamation-circle"></i>
                     <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{error}</pre>
                   </div>
                 )}
 
-                <div className="alert alert-info">
+                <div className="alert alert-info alert-dismissible fade show">
                   <i className="fas fa-info-circle"></i>
                   <p>A secure password will be automatically generated and sent to the user via email along with an activation link.</p>
                 </div>
@@ -801,7 +801,7 @@ const UserManagement = () => {
             </div>
 
             <div className="modal-body">
-              <div className="alert alert-success">
+              <div className="alert alert-success alert-dismissible fade show">
                 <i className="fas fa-check-circle"></i>
                 <p>User account created and activation email sent!</p>
               </div>
@@ -867,7 +867,7 @@ const UserManagement = () => {
                   </div>
                 )}
 
-                <div className="alert alert-warning" style={{ marginTop: '20px' }}>
+                <div className="alert alert-warning alert-dismissible fade show" style={{ marginTop: '20px' }}>
                   <i className="fas fa-exclamation-triangle"></i>
                   <p><strong>Important:</strong> Save these credentials securely. The password will not be shown again. The user must activate their account via email before they can log in.</p>
                 </div>
@@ -899,7 +899,7 @@ const UserManagement = () => {
             <form onSubmit={handleUpdate}>
               <div className="modal-body">
                 {error && (
-                  <div className="alert alert-error">
+                  <div className="alert alert-danger alert-dismissible fade show">
                     <i className="fas fa-exclamation-circle"></i>
                     <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>
                       {error}
@@ -1068,7 +1068,7 @@ const UserManagement = () => {
 
             <div className="modal-body">
               {error && (
-                <div className="alert alert-error">
+                <div className="alert alert-danger alert-dismissible fade show">
                   <i className="fas fa-exclamation-circle"></i>
                   {error}
                 </div>
@@ -1144,7 +1144,7 @@ const UserManagement = () => {
             <form onSubmit={handleResetPassword}>
               <div className="modal-body">
                 {error && (
-                  <div className="alert alert-error">
+                  <div className="alert alert-danger alert-dismissible fade show">
                     <i className="fas fa-exclamation-circle"></i>
                     <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>
                       {error}

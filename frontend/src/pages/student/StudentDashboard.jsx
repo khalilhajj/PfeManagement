@@ -36,6 +36,14 @@ const StudentDashboard = () => {
       </div>
 
       <div className="dashboard-cards">
+        <div className="info-card student-card" onClick={() => navigate('/browse-internships')} style={{ cursor: 'pointer' }}>
+          <div className="card-icon">
+            <i className="fas fa-search"></i>
+          </div>
+          <h3>Browse Internships</h3>
+          <p>Find and apply to internship opportunities</p>
+        </div>
+
         <div className="info-card student-card" onClick={() => navigate('/cv-analyzer')} style={{ cursor: 'pointer' }}>
           <div className="card-icon">
             <i className="fas fa-file-text"></i>

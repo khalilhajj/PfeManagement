@@ -48,8 +48,16 @@ const AdministratorDashboard = () => {
           <div className="card-icon">
             <i className="fas fa-briefcase"></i>
           </div>
-          <h3>Internship Oversight</h3>
-          <p>Review and approve internship applications</p>
+          <h3>Student Internships</h3>
+          <p>Review student-initiated internship applications</p>
+        </div>
+
+        <div className="info-card admin-card" onClick={() => navigate('/pending-offers')} style={{ cursor: 'pointer' }}>
+          <div className="card-icon">
+            <i className="fas fa-building"></i>
+          </div>
+          <h3>Company Offers</h3>
+          <p>Approve company internship postings</p>
         </div>
 
         <div className="info-card admin-card" onClick={() => navigate('/soutenance-planning')} style={{ cursor: 'pointer' }}>

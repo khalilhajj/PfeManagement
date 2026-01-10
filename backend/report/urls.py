@@ -3,6 +3,7 @@ from .views import (
     CreateReportView,
     ListMyReportsView,
     GetReportDetailView,
+    DeleteReportView,
     UploadReportVersionView,
     SubmitVersionForReviewView,
     ListPendingVersionsView,
@@ -17,6 +18,7 @@ urlpatterns = [
     path('reports/create/', CreateReportView.as_view(), name='create-report'),
     path('reports/my-reports/', ListMyReportsView.as_view(), name='list-my-reports'),
     path('reports/<int:id>/', GetReportDetailView.as_view(), name='get-report-detail'),
+    path('reports/<int:id>/delete/', DeleteReportView.as_view(), name='delete-report'),
     
     # Version Management
     path('reports/<int:report_id>/upload-version/', UploadReportVersionView.as_view(), name='upload-report-version'),

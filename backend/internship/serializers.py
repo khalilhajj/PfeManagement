@@ -8,6 +8,7 @@ class InternshipSerializer(serializers.ModelSerializer):
     teacher_name = serializers.SerializerMethodField(read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     type_display = serializers.CharField(source='get_type_display', read_only=True)
+    has_report = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = Internship
@@ -15,7 +16,7 @@ class InternshipSerializer(serializers.ModelSerializer):
             'id', 'student_id', 'student_name', 'teacher_id', 'teacher_name',
             'type', 'type_display', 'company_name', 'cahier_de_charges',
             'status', 'status_display', 'start_date', 'end_date',
-            'description', 'title', 'created_at', 'updated_at'
+            'description', 'title', 'created_at', 'updated_at', 'has_report'
         ]
         read_only_fields = ['student_id', 'created_at', 'updated_at']
 
@@ -30,6 +31,13 @@ class InternshipSerializer(serializers.ModelSerializer):
         if obj.teacher_id:
             return f"{obj.teacher_id.first_name} {obj.teacher_id.last_name}".strip() or obj.teacher_id.username
         return None
+
+    def get_has_report(self, obj):
+        """Check if internship has a report"""
+        try:
+            return obj.report is not None
+        except:
+            return False
 
     def validate(self, data):
         """Validate internship dates"""
