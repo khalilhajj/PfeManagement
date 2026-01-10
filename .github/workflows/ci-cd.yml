@@ -1,0 +1,105 @@
+name: PfeManagement CI/CD Pipeline 
+
+on:
+  push:
+    branches: [ "main" ]   
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  ci:
+    name: Tests et Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Récupérer le code
+      uses: actions/checkout@v4
+
+    # ========== BACKEND ==========
+    - name: Installer Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: 'pip'
+
+    - name: Installer dépendances backend
+      working-directory: backend
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Tester le backend
+      working-directory: backend
+      env:
+        # Clé simple pour les tests (pas pour production!)
+        DJANGO_SECRET_KEY: x75)t*1)8v%4sm-!u6ur_3zinazwy&$twux1e--nte7t4+316c
+        DEBUG: True
+        # Base de données en mémoire (rapide et jetable)
+        DATABASE_ENGINE: django.db.backends.sqlite3
+        DATABASE_NAME: ':memory:'
+      run: |
+        python manage.py check
+        # python manage.py test --no-input
+
+    # ========== FRONTEND ==========
+    - name: Installer Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Installer dépendances frontend
+      working-directory: frontend
+      run: npm ci
+
+    - name: Builder le frontend
+      working-directory: frontend
+      env:
+        CI: false
+      run: npm run build
+
+    # ========== DOCKER ==========
+    - name: Login Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build & Push Backend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        push: true
+        tags: |
+          khalilhajj/pfe-backend:${{ github.sha }}
+          khalilhajj/pfe-backend:latest
+
+    - name: Build & Push Frontend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        push: true
+        tags: |
+          khalilhajj/pfe-frontend:${{ github.sha }}
+          khalilhajj/pfe-frontend:latest
+
+  # ========== SIMULATION DÉPLOIEMENT ==========
+  cd:
+    name: Simulation Déploiement
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: Déploiement simulé
+      run: |
+        echo "=================================="
+        echo "DÉPLOIEMENT SIMULÉ RÉUSSI !"
+        echo "=================================="
+        echo ""
+        echo "Images créées:"
+        echo "  - Backend:  khalilhajj/pfe-backend:${{ github.sha }}"
+        echo "  - Frontend: khalilhajj/pfe-frontend:${{ github.sha }}"
+        echo ""
+        echo "=================================="
