@@ -10,6 +10,12 @@ export const AdminSidebarData = [
     cName: "nav-text",
   },
   {
+    title: "Statistics",
+    path: "/statistics",
+    icon: <AiIcons.AiOutlineBarChart />,
+    cName: "nav-text",
+  },
+  {
     title: "Archieved Reports",
     path: "/archieved-reports",
     icon: <AiIcons.AiFillEdit />,

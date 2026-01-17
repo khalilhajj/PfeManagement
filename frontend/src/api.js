@@ -582,6 +582,15 @@ export const deleteRoom = async (id) => {
   return response.data;
 };
 
+// ==================== ADMIN STATISTICS ====================
+
+export const getAdminStatistics = async () => {
+  const response = await API.get("/administrator/statistics/", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
 // ==================== COMPANY INTERNSHIP OFFERS ====================
 
 // Company: Get all my offers

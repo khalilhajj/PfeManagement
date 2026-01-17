@@ -16,6 +16,7 @@ from .room_views import (
     DeleteRoomView,
     GetAvailableRoomsView,
 )
+from .stats_views import AdminStatisticsView
 
 urlpatterns = [
     path('users/', ListUsersView.as_view(), name='list-users'),
@@ -33,5 +34,7 @@ urlpatterns = [
     path('rooms/<int:id>/update/', UpdateRoomView.as_view(), name='update-room'),
     path('rooms/<int:id>/delete/', DeleteRoomView.as_view(), name='delete-room'),
     path('rooms/available/', GetAvailableRoomsView.as_view(), name='available-rooms'),
-    path('stats/', GetUserStatsView.as_view(), name='user-stats'),
+    
+    # Statistics
+    path('statistics/', AdminStatisticsView.as_view(), name='admin-statistics'),
 ]
