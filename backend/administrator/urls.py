@@ -9,6 +9,13 @@ from .views import (
     ListRolesView,
     GetUserStatsView,
 )
+from .room_views import (
+    ListRoomsView,
+    CreateRoomView,
+    UpdateRoomView,
+    DeleteRoomView,
+    GetAvailableRoomsView,
+)
 
 urlpatterns = [
     path('users/', ListUsersView.as_view(), name='list-users'),
@@ -18,5 +25,13 @@ urlpatterns = [
     path('users/<int:id>/delete/', DeleteUserView.as_view(), name='delete-user'),
     path('users/<int:id>/reset-password/', ResetUserPasswordView.as_view(), name='reset-password'),
     path('roles/', ListRolesView.as_view(), name='list-roles'),
+    path('stats/', GetUserStatsView.as_view(), name='user-stats'),
+    
+    # Room Management
+    path('rooms/', ListRoomsView.as_view(), name='list-rooms'),
+    path('rooms/create/', CreateRoomView.as_view(), name='create-room'),
+    path('rooms/<int:id>/update/', UpdateRoomView.as_view(), name='update-room'),
+    path('rooms/<int:id>/delete/', DeleteRoomView.as_view(), name='delete-room'),
+    path('rooms/available/', GetAvailableRoomsView.as_view(), name='available-rooms'),
     path('stats/', GetUserStatsView.as_view(), name='user-stats'),
 ]

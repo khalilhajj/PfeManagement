@@ -27,6 +27,7 @@ import BrowseInternships from "./pages/student/BrowseInternships";
 import MyApplications from "./pages/student/MyApplications";
 // Admin pending offers
 import PendingOffers from "./pages/administrator/PendingOffers";
+import RoomManagement from "./pages/administrator/RoomManagement";
 
 const router = createBrowserRouter([
   {
@@ -95,7 +96,7 @@ const router = createBrowserRouter([
       },
       {
         element: <ProtectedRoute allowedRoles={["Administrator"]} />,
-        children: [{ path: "/user-management", element: <UserManagement /> }, { path: "/soutenance-planning", element: <SoutenancePlanning /> }],
+        children: [{ path: "/user-management", element: <UserManagement /> }, { path: "/soutenance-planning", element: <SoutenancePlanning /> }, { path: "/room-management", element: <RoomManagement /> }],
       },
       {
         element: (

@@ -40,6 +40,12 @@ export const AdminSidebarData = [
     cName: "nav-text",
   },
   {
+    title: "Room Management",
+    path: "/room-management",
+    icon: <AiIcons.AiOutlineBank />,
+    cName: "nav-text",
+  },
+  {
     title: "Soutenance Planning",
     path: "/soutenance-planning",
     icon: <AiIcons.AiFillCalendar />,

@@ -45,6 +45,25 @@ class Internship(models.Model):
     class Meta:
         ordering = ['-created_at']
     
+class Room(models.Model):
+    """Available rooms for soutenances"""
+    name = models.CharField(max_length=100, unique=True)
+    building = models.CharField(max_length=100, blank=True, null=True)
+    capacity = models.IntegerField(help_text="Maximum number of people")
+    floor = models.CharField(max_length=50, blank=True, null=True)
+    equipment = models.TextField(blank=True, null=True, help_text="Available equipment (projector, computer, etc.)")
+    is_available = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['building', 'name']
+
+    def __str__(self):
+        if self.building:
+            return f"{self.name} - {self.building}"
+        return self.name
+
 class TeacherInvitation(models.Model):
     STATUS_CHOICES = [
         (0, 'Pending'),
@@ -87,7 +106,13 @@ class Soutenance(models.Model):
     )
     date = models.DateField()
     time = models.TimeField()
-    room = models.CharField(max_length=255)
+    room = models.ForeignKey(
+        'Room',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='soutenances'
+    )
     STATUS_CHOICES = [
         ('Planned', 'Planned'),
         ('Done', 'Done'),

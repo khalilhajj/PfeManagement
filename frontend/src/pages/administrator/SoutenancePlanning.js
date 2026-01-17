@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
-import { getSoutenances, createSoutenance, updateSoutenance, deleteSoutenance, getSoutenanceCandidates, getTeachersList } from '../../api';
+import { getSoutenances, createSoutenance, updateSoutenance, deleteSoutenance, getSoutenanceCandidates, getTeachersList, getAvailableRooms } from '../../api';
 import './SoutenancePlanning.css';
 import { FaCalendarAlt, FaClock, FaDoorOpen, FaChalkboardTeacher, FaUserGraduate, FaSearch, FaPlus, FaCheckCircle, FaHourglassHalf, FaEdit, FaTrash } from 'react-icons/fa';
 
@@ -8,6 +8,7 @@ const SoutenancePlanning = () => {
     const [soutenances, setSoutenances] = useState([]);
     const [candidates, setCandidates] = useState([]);
     const [teachers, setTeachers] = useState([]);
+    const [rooms, setRooms] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
@@ -37,14 +38,16 @@ const SoutenancePlanning = () => {
 
     const fetchData = async () => {
         try {
-            const [sData, tData, cData] = await Promise.all([
+            const [sData, tData, cData, rData] = await Promise.all([
                 getSoutenances(),
                 getTeachersList(),
-                getSoutenanceCandidates()
+                getSoutenanceCandidates(),
+                getAvailableRooms()
             ]);
             setSoutenances(sData);
             setTeachers(tData);
             setCandidates(cData);
+            setRooms(rData);
         } catch (err) {
             console.error(err);
         }
@@ -66,7 +69,7 @@ const SoutenancePlanning = () => {
             // Strategy: I will blindly populate what I can, or better: fetch detail on Edit.
             date: soutenance.date,
             time: soutenance.time,
-            room: soutenance.room,
+            room: typeof soutenance.room === 'object' ? soutenance.room?.id : soutenance.room,
             // We need to map jury objects back to IDs if they are objects
             jury1: soutenance.juries[0]?.id || '', 
             jury2: soutenance.juries[1]?.id || ''
@@ -233,7 +236,7 @@ const SoutenancePlanning = () => {
                                         <div><FaCalendarAlt /> {s.date}</div>
                                         <div className="text-muted"><FaClock /> {s.time}</div>
                                     </td>
-                                    <td><FaDoorOpen /> {s.room}</td>
+                                    <td><FaDoorOpen /> {s.room_display || 'Not assigned'}</td>
                                     <td>
                                         {s.juries.map(j => (
                                             <div key={j.id}><FaChalkboardTeacher /> {j.member_name}</div>
@@ -324,7 +327,18 @@ const SoutenancePlanning = () => {
                             <div className="col-md-4">
                                 <Form.Group className="mb-3">
                                     <Form.Label>Room</Form.Label>
-                                    <Form.Control type="text" placeholder="e.g. Room A1" required value={formData.room} onChange={e => setFormData({...formData, room: e.target.value})} />
+                                    <Form.Select 
+                                        required 
+                                        value={formData.room} 
+                                        onChange={e => setFormData({...formData, room: e.target.value})}
+                                    >
+                                        <option value="">-- Select Room --</option>
+                                        {rooms.map(r => (
+                                            <option key={r.id} value={r.id}>
+                                                {r.building ? `${r.name} - ${r.building}` : r.name} ({r.capacity} seats)
+                                            </option>
+                                        ))}
+                                    </Form.Select>
                                 </Form.Group>
                             </div>
                         </div>

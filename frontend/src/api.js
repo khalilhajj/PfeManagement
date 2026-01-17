@@ -545,6 +545,43 @@ export const deleteSoutenance = async (id) => {
   return response.data;
 };
 
+// ==================== ROOM MANAGEMENT ====================
+
+export const getAvailableRooms = async () => {
+  const response = await API.get("/administrator/rooms/available/", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const getRooms = async () => {
+  const response = await API.get("/administrator/rooms/", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const createRoom = async (data) => {
+  const response = await API.post("/administrator/rooms/create/", data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const updateRoom = async (id, data) => {
+  const response = await API.put(`/administrator/rooms/${id}/update/`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const deleteRoom = async (id) => {
+  const response = await API.delete(`/administrator/rooms/${id}/delete/`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
 // ==================== COMPANY INTERNSHIP OFFERS ====================
 
 // Company: Get all my offers
