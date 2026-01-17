@@ -81,8 +81,42 @@ class AdminStatisticsView(APIView):
         # Application Statistics
         total_applications = InternshipApplication.objects.count()
         pending_applications = InternshipApplication.objects.filter(status=0).count()
+        interview_applications = InternshipApplication.objects.filter(status=1).count()
         accepted_applications = InternshipApplication.objects.filter(status=2).count()
         rejected_applications = InternshipApplication.objects.filter(status=3).count()
+
+        # Top companies by offers
+        top_companies = list(InternshipOffer.objects.values(
+            'company__username', 'company__first_name', 'company__last_name'
+        ).annotate(
+            offer_count=Count('id')
+        ).order_by('-offer_count')[:5])
+
+        # Monthly offers trend (last 6 months)
+        monthly_offers = []
+        for i in range(5, -1, -1):
+            month_date = today - timedelta(days=30*i)
+            month_count = InternshipOffer.objects.filter(
+                created_at__year=month_date.year,
+                created_at__month=month_date.month
+            ).count()
+            monthly_offers.append({
+                'month': month_date.strftime('%b %Y'),
+                'count': month_count
+            })
+
+        # Monthly applications trend (last 6 months)
+        monthly_applications = []
+        for i in range(5, -1, -1):
+            month_date = today - timedelta(days=30*i)
+            month_count = InternshipApplication.objects.filter(
+                created_at__year=month_date.year,
+                created_at__month=month_date.month
+            ).count()
+            monthly_applications.append({
+                'month': month_date.strftime('%b %Y'),
+                'count': month_count
+            })
 
         # Monthly internships trend (last 6 months)
         monthly_internships = []
@@ -108,6 +142,21 @@ class AdminStatisticsView(APIView):
         soutenance_status_chart = [
             {'name': 'Planned', 'value': planned_soutenances},
             {'name': 'Done', 'value': done_soutenances}
+        ]
+
+        # Company offers chart
+        offer_status_chart = [
+            {'name': 'Pending', 'value': pending_offers},
+            {'name': 'Approved', 'value': approved_offers},
+            {'name': 'Rejected', 'value': rejected_offers}
+        ]
+
+        # Applications status chart
+        application_status_chart = [
+            {'name': 'Pending', 'value': pending_applications},
+            {'name': 'Interview', 'value': interview_applications},
+            {'name': 'Accepted', 'value': accepted_applications},
+            {'name': 'Rejected', 'value': rejected_applications}
         ]
 
         # User distribution for chart
@@ -166,13 +215,19 @@ class AdminStatisticsView(APIView):
                 'total': total_offers,
                 'pending': pending_offers,
                 'approved': approved_offers,
-                'rejected': rejected_offers
+                'rejected': rejected_offers,
+                'status_chart': offer_status_chart,
+                'monthly_trend': monthly_offers,
+                'top_companies': top_companies
             },
             'applications': {
                 'total': total_applications,
                 'pending': pending_applications,
+                'interview': interview_applications,
                 'accepted': accepted_applications,
-                'rejected': rejected_applications
+                'rejected': rejected_applications,
+                'status_chart': application_status_chart,
+                'monthly_trend': monthly_applications
             },
             'users': {
                 'total': active_users,

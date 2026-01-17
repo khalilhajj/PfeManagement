@@ -291,42 +291,151 @@ const Statistics = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="stat-detail-card">
-          <h4><FaBuilding /> Company Offers</h4>
-          <div className="stat-rows">
-            <div className="stat-row">
-              <span>Total Offers:</span>
-              <strong>{stats.offers.total}</strong>
-            </div>
-            <div className="stat-row">
-              <span>Pending:</span>
+      {/* Company Statistics Section */}
+      <br/>
+      <div className="stats-section">
+        
+        {/* Offers Status Distribution */}
+        <div className="chart-container">
+          <h4>Internship Offers Status Distribution</h4>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={stats.offers.status_chart}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="value" name="Number of Offers">
+                {stats.offers.status_chart.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="stats-summary">
+            <div className="summary-item">
+              <span className="badge badge-pending">Pending</span>
               <strong>{stats.offers.pending}</strong>
             </div>
-            <div className="stat-row">
-              <span>Approved:</span>
+            <div className="summary-item">
+              <span className="badge badge-approved">Approved</span>
               <strong>{stats.offers.approved}</strong>
+            </div>
+            <div className="summary-item">
+              <span className="badge badge-rejected">Rejected</span>
+              <strong>{stats.offers.rejected}</strong>
             </div>
           </div>
         </div>
 
-        <div className="stat-detail-card">
-          <h4><FaBriefcase /> Applications</h4>
-          <div className="stat-rows">
-            <div className="stat-row">
-              <span>Total Applications:</span>
-              <strong>{stats.applications.total}</strong>
-            </div>
-            <div className="stat-row">
-              <span>Pending:</span>
+        {/* Applications Status Distribution */}
+        <div className="chart-container">
+          <h4>Applications Status Distribution</h4>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={stats.applications.status_chart}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={100}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {stats.applications.status_chart.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="stats-summary">
+            <div className="summary-item">
+              <span className="badge badge-pending">Pending</span>
               <strong>{stats.applications.pending}</strong>
             </div>
-            <div className="stat-row">
-              <span>Accepted:</span>
+            <div className="summary-item">
+              <span className="badge badge-interview">Interview</span>
+              <strong>{stats.applications.interview}</strong>
+            </div>
+            <div className="summary-item">
+              <span className="badge badge-accepted">Accepted</span>
               <strong>{stats.applications.accepted}</strong>
+            </div>
+            <div className="summary-item">
+              <span className="badge badge-rejected">Rejected</span>
+              <strong>{stats.applications.rejected}</strong>
             </div>
           </div>
         </div>
+
+        {/* Monthly Offers Trend */}
+        <div className="chart-container">
+          <h4>Monthly Offers Trend</h4>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={stats.offers.monthly_trend}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line 
+                type="monotone" 
+                dataKey="count" 
+                stroke="#8884d8" 
+                strokeWidth={2}
+                name="Offers Posted"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Monthly Applications Trend */}
+        <div className="chart-container">
+          <h4>Monthly Applications Trend</h4>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={stats.applications.monthly_trend}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line 
+                type="monotone" 
+                dataKey="count" 
+                stroke="#82ca9d" 
+                strokeWidth={2}
+                name="Applications Received"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Top Companies */}
+        {stats.offers.top_companies && stats.offers.top_companies.length > 0 && (
+          <div className="chart-container">
+            <h4>Top Companies by Offers Posted</h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart 
+                data={stats.offers.top_companies.map(company => ({
+                  name: company.company__first_name || company.company__username,
+                  offers: company.offer_count
+                }))}
+                layout="vertical"
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis dataKey="name" type="category" width={150} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="offers" fill="#8884d8" name="Number of Offers" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
     </div>
   );
