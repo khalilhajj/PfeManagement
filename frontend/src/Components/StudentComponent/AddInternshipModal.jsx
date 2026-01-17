@@ -63,10 +63,29 @@ const AddInternshipModal = ({ onClose, onSuccess }) => {
             setError('Both start and end dates are required');
             return false;
         }
-        if (new Date(formData.start_date) >= new Date(formData.end_date)) {
+        
+        const startDate = new Date(formData.start_date);
+        const endDate = new Date(formData.end_date);
+        
+        if (startDate >= endDate) {
             setError('End date must be after start date');
             return false;
         }
+        
+        // Calculate duration in months
+        const monthsDiff = (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
+                          (endDate.getMonth() - startDate.getMonth());
+        
+        if (monthsDiff < 4) {
+            setError('Internship duration must be at least 4 months');
+            return false;
+        }
+        
+        if (monthsDiff > 6) {
+            setError('Internship duration cannot exceed 6 months');
+            return false;
+        }
+        
         if (!formData.description.trim()) {
             setError('Description is required');
             return false;
@@ -98,10 +117,30 @@ const AddInternshipModal = ({ onClose, onSuccess }) => {
             }, 1500);
         } catch (err) {
             console.error('Error creating internship:', err);
-            const errorMessage = err.response?.data?.error || 
-                               err.response?.data?.message ||
-                               'Failed to create internship. Please try again.';
-            setError(errorMessage);
+            
+            // Handle validation errors from backend
+            if (err.response?.data) {
+                const errorData = err.response.data;
+                
+                // If there are field-specific errors (like end_date validation)
+                if (errorData.end_date) {
+                    setError(Array.isArray(errorData.end_date) ? errorData.end_date[0] : errorData.end_date);
+                } else if (errorData.start_date) {
+                    setError(Array.isArray(errorData.start_date) ? errorData.start_date[0] : errorData.start_date);
+                } else if (errorData.error) {
+                    setError(errorData.error);
+                } else if (errorData.message) {
+                    setError(errorData.message);
+                } else if (errorData.non_field_errors) {
+                    setError(Array.isArray(errorData.non_field_errors) ? errorData.non_field_errors[0] : errorData.non_field_errors);
+                } else {
+                    // Try to extract first error from any field
+                    const firstError = Object.values(errorData)[0];
+                    setError(Array.isArray(firstError) ? firstError[0] : firstError || 'Failed to create internship. Please try again.');
+                }
+            } else {
+                setError('Failed to create internship. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
