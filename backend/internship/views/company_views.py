@@ -16,6 +16,7 @@ from ..company_serializers import (
     InterviewSlotSerializer, InterviewSlotCreateSerializer,
     InterviewDecisionSerializer, SelectInterviewSlotSerializer
 )
+from ..application_matcher import calculate_match_score, batch_calculate_matches
 
 
 # ==================== COMPANY VIEWS ====================
@@ -446,4 +447,65 @@ class AdminReviewOfferView(APIView):
         return Response({
             'message': f'Offer {status_text} successfully',
             'offer': InternshipOfferSerializer(offer, context={'request': request}).data
+        })
+
+
+class CalculateApplicationMatchView(APIView):
+    """Calculate AI-based match score for a specific application"""
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, application_id):
+        """Calculate match score for an application"""
+        application = get_object_or_404(InternshipApplication, id=application_id)
+        
+        # Only company that owns the offer can calculate match
+        if application.offer.company != request.user:
+            return Response({'error': 'Access denied'}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Calculate match score
+        match_result = calculate_match_score(application)
+        
+        if not match_result['error']:
+            # Save to database
+            application.match_score = match_result['score']
+            application.match_analysis = match_result['analysis']
+            application.save()
+        
+        return Response({
+            'application_id': application.id,
+            'student_name': f"{application.student.first_name} {application.student.last_name}",
+            'match_score': match_result['score'],
+            'match_analysis': match_result['analysis'],
+            'error': match_result['error']
+        })
+
+
+class BatchCalculateMatchesView(APIView):
+    """Calculate AI match scores for all applications to an offer"""
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, offer_id):
+        """Calculate match scores for all applications to this offer"""
+        if not request.user.role or request.user.role.name != 'Company':
+            return Response({'error': 'Only companies can access this'}, status=status.HTTP_403_FORBIDDEN)
+        
+        offer = get_object_or_404(InternshipOffer, id=offer_id, company=request.user)
+        applications = InternshipApplication.objects.filter(offer=offer)
+        
+        if not applications.exists():
+            return Response({'message': 'No applications found for this offer'}, status=status.HTTP_200_OK)
+        
+        # Calculate matches for all applications
+        results = batch_calculate_matches(applications)
+        
+        # Save scores to database
+        for result in results:
+            app = applications.get(id=result['application_id'])
+            app.match_score = result['match_score']
+            app.match_analysis = result['analysis']
+            app.save()
+        
+        return Response({
+            'message': f'Match scores calculated for {len(results)} applications',
+            'results': results
         })

@@ -737,6 +737,40 @@ export const selectInterviewSlot = async (applicationId, slotId) => {
   return response.data;
 };
 
+// ==================== AI MATCHING ====================
+
+// Company: Calculate match score for a single application
+export const calculateApplicationMatch = async (applicationId) => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.post(
+    `/internship/applications/${applicationId}/calculate-match/`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
+// Company: Batch calculate match scores for all applications to an offer
+export const batchCalculateMatches = async (offerId) => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.post(
+    `/internship/offers/${offerId}/batch-calculate-matches/`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
 // ==================== STUDENT BROWSE & APPLY ====================
 
 // Student: Browse available offers

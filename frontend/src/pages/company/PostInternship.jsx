@@ -10,6 +10,11 @@ const PostInternship = () => {
   const [submitting, setSubmitting] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info', onConfirm: null });
+  
+  // Skills/Requirements tags
+  const [requirementTags, setRequirementTags] = useState([]);
+  const [requirementInput, setRequirementInput] = useState('');
+  
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -42,11 +47,33 @@ const PostInternship = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleRequirementKeyDown = (e) => {
+    if (e.key === ' ' && requirementInput.trim()) {
+      e.preventDefault();
+      const newTag = requirementInput.trim();
+      if (!requirementTags.includes(newTag)) {
+        setRequirementTags([...requirementTags, newTag]);
+      }
+      setRequirementInput('');
+    } else if (e.key === 'Backspace' && !requirementInput && requirementTags.length > 0) {
+      e.preventDefault();
+      setRequirementTags(requirementTags.slice(0, -1));
+    }
+  };
+
+  const removeRequirementTag = (indexToRemove) => {
+    setRequirementTags(requirementTags.filter((_, index) => index !== indexToRemove));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await createInternshipOffer(formData);
+      // Combine tags into requirements string
+      const requirementsString = requirementTags.join(', ');
+      const submitData = { ...formData, requirements: requirementsString };
+      
+      await createInternshipOffer(submitData);
       setModal({ isOpen: true, title: 'Success!', message: 'Internship offer created! Waiting for admin approval.', type: 'success', onConfirm: null });
       setShowForm(false);
       setFormData({
@@ -60,6 +87,8 @@ const PostInternship = () => {
         end_date: '',
         positions_available: 1
       });
+      setRequirementTags([]);
+      setRequirementInput('');
       fetchOffers();
     } catch (error) {
       setModal({ isOpen: true, title: 'Error', message: error.response?.data?.error || 'Failed to create offer', type: 'danger', onConfirm: null });
@@ -148,14 +177,34 @@ const PostInternship = () => {
             </div>
 
             <div className="form-group">
-              <label>Requirements</label>
-              <textarea
-                name="requirements"
-                value={formData.requirements}
-                onChange={handleInputChange}
-                rows="3"
-                placeholder="Required skills, qualifications..."
-              />
+              <label>Requirements (Skills)</label>
+              <div className="tags-input-container">
+                <input
+                  type="text"
+                  className="tag-input"
+                  value={requirementInput}
+                  onChange={(e) => setRequirementInput(e.target.value)}
+                  onKeyDown={handleRequirementKeyDown}
+                  placeholder="Type a skill and press space..."
+                />
+                <small className="input-hint">💡 Press space to add each skill as a tag</small>
+                {requirementTags.length > 0 && (
+                  <div className="tags-display">
+                    {requirementTags.map((tag, index) => (
+                      <span key={index} className="skill-tag">
+                        {tag}
+                        <button
+                          type="button"
+                          className="tag-remove"
+                          onClick={() => removeRequirementTag(index)}
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="form-row">

@@ -226,6 +226,8 @@ class InternshipApplication(models.Model):
     cv_file = models.FileField(upload_to='application_cvs/', blank=True, null=True)
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     company_feedback = models.TextField(blank=True, null=True)
+    match_score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # AI-calculated match percentage
+    match_analysis = models.TextField(blank=True, null=True)  # AI analysis of the match
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

@@ -29,7 +29,9 @@ from .views.company_views import (
     StudentApplicationsView,
     StudentSelectInterviewSlotView,
     AdminPendingOffersView,
-    AdminReviewOfferView
+    AdminReviewOfferView,
+    CalculateApplicationMatchView,
+    BatchCalculateMatchesView
 )
 
 urlpatterns = [
@@ -74,4 +76,8 @@ urlpatterns = [
     # Admin Review Offers
     path('admin/offers/', AdminPendingOffersView.as_view(), name='admin-pending-offers'),
     path('admin/offers/<int:offer_id>/review/', AdminReviewOfferView.as_view(), name='admin-review-offer'),
+    
+    # AI Matching
+    path('applications/<int:application_id>/calculate-match/', CalculateApplicationMatchView.as_view(), name='calculate-match'),
+    path('offers/<int:offer_id>/batch-calculate-matches/', BatchCalculateMatchesView.as_view(), name='batch-calculate-matches'),
 ]
