@@ -185,6 +185,7 @@ class InternshipOffer(models.Model):
     positions_available = models.IntegerField(default=1)
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     admin_feedback = models.TextField(blank=True, null=True)  # Reason for rejection
+    external_url = models.URLField(max_length=500, blank=True, null=True)  # URL for scraped jobs
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

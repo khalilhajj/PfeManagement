@@ -43,7 +43,7 @@ class InternshipOfferSerializer(serializers.ModelSerializer):
             'type', 'type_display', 'location', 'duration', 'start_date', 'end_date',
             'positions_available', 'status', 'status_display', 'admin_feedback',
             'applications_count', 'approved_applications_count', 'has_applied',
-            'created_at', 'updated_at'
+            'external_url', 'created_at', 'updated_at'
         ]
         read_only_fields = ['company', 'status', 'admin_feedback', 'created_at', 'updated_at']
     
