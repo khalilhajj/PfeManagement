@@ -45,6 +45,25 @@ class Internship(models.Model):
     class Meta:
         ordering = ['-created_at']
     
+class Room(models.Model):
+    """Available rooms for soutenances"""
+    name = models.CharField(max_length=100, unique=True)
+    building = models.CharField(max_length=100, blank=True, null=True)
+    capacity = models.IntegerField(help_text="Maximum number of people")
+    floor = models.CharField(max_length=50, blank=True, null=True)
+    equipment = models.TextField(blank=True, null=True, help_text="Available equipment (projector, computer, etc.)")
+    is_available = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['building', 'name']
+
+    def __str__(self):
+        if self.building:
+            return f"{self.name} - {self.building}"
+        return self.name
+
 class TeacherInvitation(models.Model):
     STATUS_CHOICES = [
         (0, 'Pending'),
@@ -87,7 +106,13 @@ class Soutenance(models.Model):
     )
     date = models.DateField()
     time = models.TimeField()
-    room = models.CharField(max_length=255)
+    room = models.ForeignKey(
+        'Room',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='soutenances'
+    )
     STATUS_CHOICES = [
         ('Planned', 'Planned'),
         ('Done', 'Done'),
@@ -160,6 +185,7 @@ class InternshipOffer(models.Model):
     positions_available = models.IntegerField(default=1)
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     admin_feedback = models.TextField(blank=True, null=True)  # Reason for rejection
+    external_url = models.URLField(max_length=500, blank=True, null=True)  # URL for scraped jobs
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -201,6 +227,8 @@ class InternshipApplication(models.Model):
     cv_file = models.FileField(upload_to='application_cvs/', blank=True, null=True)
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     company_feedback = models.TextField(blank=True, null=True)
+    match_score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # AI-calculated match percentage
+    match_analysis = models.TextField(blank=True, null=True)  # AI analysis of the match
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

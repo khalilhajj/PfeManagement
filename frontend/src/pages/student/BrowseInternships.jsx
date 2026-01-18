@@ -176,6 +176,15 @@ const BrowseInternships = () => {
                   <div className={`application-status status-${getApplicationStatus(offer.id)}`}>
                     {getStatusLabel(getApplicationStatus(offer.id))}
                   </div>
+                ) : offer.external_url ? (
+                  <a 
+                    href={offer.external_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="btn-apply-external"
+                  >
+                    <i className="fas fa-external-link-alt"></i> Postuler sur Tanitjobs
+                  </a>
                 ) : (
                   <>
                     {applyingTo === offer.id ? (

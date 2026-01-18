@@ -6,7 +6,9 @@ import {
   getCompanyOffers,
   getInterviewSlots,
   createInterviewSlot,
-  deleteInterviewSlot
+  deleteInterviewSlot,
+  calculateApplicationMatch,
+  batchCalculateMatches
 } from '../../api';
 import CustomModal from '../../Components/common/CustomModal';
 import './CompanyApplications.css';
@@ -22,6 +24,10 @@ const CompanyApplications = () => {
   const [feedback, setFeedback] = useState('');
   const [interviewNotes, setInterviewNotes] = useState('');
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info', onConfirm: null });
+  
+  // AI Match scoring
+  const [calculatingMatch, setCalculatingMatch] = useState(null);
+  const [batchCalculating, setBatchCalculating] = useState(null);
   
   // Inline slot management
   const [managingSlotsFor, setManagingSlotsFor] = useState(null);
@@ -140,6 +146,64 @@ const CompanyApplications = () => {
     });
   };
 
+  const handleCalculateMatch = async (applicationId) => {
+    setCalculatingMatch(applicationId);
+    try {
+      await calculateApplicationMatch(applicationId);
+      setModal({ 
+        isOpen: true, 
+        title: 'Success!', 
+        message: 'AI match score calculated successfully!', 
+        type: 'success', 
+        onConfirm: null 
+      });
+      fetchData(); // Refresh to show new match score
+    } catch (error) {
+      setModal({ 
+        isOpen: true, 
+        title: 'Error', 
+        message: error.response?.data?.error || 'Failed to calculate match score', 
+        type: 'danger', 
+        onConfirm: null 
+      });
+    } finally {
+      setCalculatingMatch(null);
+    }
+  };
+
+  const handleBatchCalculate = async (offerId) => {
+    setBatchCalculating(offerId);
+    try {
+      const result = await batchCalculateMatches(offerId);
+      setModal({ 
+        isOpen: true, 
+        title: 'Success!', 
+        message: result.message || 'Match scores calculated for all applications!', 
+        type: 'success', 
+        onConfirm: null 
+      });
+      fetchData(); // Refresh to show new match scores
+    } catch (error) {
+      setModal({ 
+        isOpen: true, 
+        title: 'Error', 
+        message: error.response?.data?.error || 'Failed to calculate match scores', 
+        type: 'danger', 
+        onConfirm: null 
+      });
+    } finally {
+      setBatchCalculating(null);
+    }
+  };
+
+  const getMatchScoreColor = (score) => {
+    if (!score) return 'gray';
+    if (score >= 80) return '#22c55e'; // green
+    if (score >= 60) return '#3b82f6'; // blue
+    if (score >= 40) return '#f59e0b'; // orange
+    return '#ef4444'; // red
+  };
+
   const getStatusBadge = (status) => {
     const statusMap = {
       0: { label: 'Pending', class: 'badge-warning' },
@@ -212,12 +276,21 @@ const CompanyApplications = () => {
                 <h2>{group.offer?.title}</h2>
                 <span className="app-count">{group.applications.length} application(s)</span>
               </div>
-              <button 
-                className={`btn-slots ${managingSlotsFor === group.offer?.id ? 'active' : ''}`}
-                onClick={() => toggleSlotManagement(group.offer?.id)}
-              >
-                 {managingSlotsFor === group.offer?.id ? 'Hide' : 'Manage'} Interview Slots
-              </button>
+              <div className="header-actions">
+                <button 
+                  className={`btn-ai-match ${batchCalculating === group.offer?.id ? 'loading' : ''}`}
+                  onClick={() => handleBatchCalculate(group.offer?.id)}
+                  disabled={batchCalculating === group.offer?.id || group.applications.length === 0}
+                >
+                  {batchCalculating === group.offer?.id ? '🔄 Calculating...' : '🤖 AI Match All'}
+                </button>
+                <button 
+                  className={`btn-slots ${managingSlotsFor === group.offer?.id ? 'active' : ''}`}
+                  onClick={() => toggleSlotManagement(group.offer?.id)}
+                >
+                   {managingSlotsFor === group.offer?.id ? 'Hide' : 'Manage'} Interview Slots
+                </button>
+              </div>
             </div>
 
             {/* Inline Slot Management */}
@@ -264,6 +337,7 @@ const CompanyApplications = () => {
                 <thead>
                   <tr>
                     <th>Student</th>
+                    <th>AI Match</th>
                     <th>Contact</th>
                     <th>Applied</th>
                     <th>Status</th>
@@ -280,9 +354,41 @@ const CompanyApplications = () => {
                             <img src={app.student_info?.profile_picture || '/default-avatar.png'} alt="" className="avatar-small" />
                             <div>
                               <strong>{app.student_info?.full_name}</strong>
-                              {app.cv_file && <a href={app.cv_file} target="_blank" rel="noopener noreferrer" className="cv-link-inline"> CV</a>}
+                              {app.cv_file && <a href={app.cv_file} target="_blank" rel="noopener noreferrer" className="cv-link-inline">📄 CV</a>}
                             </div>
                           </div>
+                        </td>
+                        <td className="match-cell">
+                          {app.match_score ? (
+                            <div className="match-score-display">
+                              <div 
+                                className="match-circle" 
+                                style={{ 
+                                  background: `conic-gradient(${getMatchScoreColor(app.match_score)} ${app.match_score * 3.6}deg, #e5e7eb 0deg)` 
+                                }}
+                              >
+                                <span className="match-percentage">{Math.round(app.match_score)}%</span>
+                              </div>
+                              {app.match_analysis && (
+                                <button 
+                                  className="btn-view-analysis" 
+                                  onClick={() => setExpandedApp(expandedApp === app.id ? null : app.id)}
+                                  title="View AI Analysis"
+                                >
+                                  📊
+                                </button>
+                              )}
+                            </div>
+                          ) : (
+                            <button 
+                              className={`btn-calculate-match ${calculatingMatch === app.id ? 'loading' : ''}`}
+                              onClick={() => handleCalculateMatch(app.id)}
+                              disabled={calculatingMatch === app.id}
+                              title="Calculate AI Match"
+                            >
+                              {calculatingMatch === app.id ? '⏳' : '🤖'}
+                            </button>
+                          )}
                         </td>
                         <td className="contact-cell">
                           <div className="contact-info">
@@ -326,8 +432,14 @@ const CompanyApplications = () => {
                       
                       {expandedApp === app.id && (
                         <tr className="expanded-row">
-                          <td colSpan="6">
+                          <td colSpan="7">
                             <div className="expanded-content">
+                              {app.match_analysis && (
+                                <div className="detail-section ai-analysis">
+                                  <strong>🤖 AI Match Analysis:</strong>
+                                  <pre className="analysis-text">{app.match_analysis}</pre>
+                                </div>
+                              )}
                               {app.cover_letter && <div className="detail-section"><strong>Cover Letter:</strong><p>{app.cover_letter}</p></div>}
                               {app.company_feedback && <div className="detail-section"><strong>Feedback:</strong><p>{app.company_feedback}</p></div>}
                               {app.interview_notes && <div className="detail-section"><strong>Notes:</strong><p>{app.interview_notes}</p></div>}
@@ -338,7 +450,7 @@ const CompanyApplications = () => {
                       
                       {reviewingId === app.id && (
                         <tr className="form-row">
-                          <td colSpan="6">
+                          <td colSpan="7">
                             <div className="inline-form">
                               <textarea placeholder="Feedback for student (optional)..." value={feedback} onChange={(e) => setFeedback(e.target.value)} rows="2" />
                               <div className="form-actions">
@@ -352,7 +464,7 @@ const CompanyApplications = () => {
                       
                       {decisionId === app.id && (
                         <tr className="form-row">
-                          <td colSpan="6">
+                          <td colSpan="7">
                             <div className="inline-form">
                               <textarea placeholder="Interview notes (internal)..." value={interviewNotes} onChange={(e) => setInterviewNotes(e.target.value)} rows="2" />
                               <textarea placeholder="Feedback for student..." value={feedback} onChange={(e) => setFeedback(e.target.value)} rows="2" />

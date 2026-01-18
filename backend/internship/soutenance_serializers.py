@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Soutenance, Jury, Internship
+from .models import Soutenance, Jury, Internship, Room
 from authentication.models import User
 
 class JurySerializer(serializers.ModelSerializer):
@@ -27,20 +27,28 @@ class SoutenanceSerializer(serializers.ModelSerializer):
     )
     student_name = serializers.SerializerMethodField(read_only=True)
     internship_title = serializers.CharField(source='internship.title', read_only=True)
+    room_display = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = Soutenance
         fields = [
             'id', 'internship', 'internship_title', 'student_name', 
-            'date', 'time', 'room', 'status', 'grade', 'juries', 'jury_ids'
+            'date', 'time', 'room', 'room_display', 'status', 'grade', 'juries', 'jury_ids'
         ]
-        read_only_fields = ['status', 'juries', 'id']
+        read_only_fields = ['status', 'juries', 'id', 'room_display']
 
     def get_student_name(self, obj):
         if obj.internship and obj.internship.student_id:
             s = obj.internship.student_id
             return f"{s.first_name} {s.last_name}".strip() or s.username
         return "Unknown"
+    
+    def get_room_display(self, obj):
+        if obj.room:
+            if obj.room.building:
+                return f"{obj.room.name} - {obj.room.building}"
+            return obj.room.name
+        return "Not assigned"
 
     def validate_jury_ids(self, value):
         if len(value) != 2:

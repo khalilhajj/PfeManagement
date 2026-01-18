@@ -43,7 +43,7 @@ class InternshipOfferSerializer(serializers.ModelSerializer):
             'type', 'type_display', 'location', 'duration', 'start_date', 'end_date',
             'positions_available', 'status', 'status_display', 'admin_feedback',
             'applications_count', 'approved_applications_count', 'has_applied',
-            'created_at', 'updated_at'
+            'external_url', 'created_at', 'updated_at'
         ]
         read_only_fields = ['company', 'status', 'admin_feedback', 'created_at', 'updated_at']
     
@@ -89,11 +89,13 @@ class InternshipApplicationSerializer(serializers.ModelSerializer):
             'id', 'offer', 'offer_info', 'student', 'student_info',
             'cover_letter', 'cv_file', 'status', 'status_display',
             'company_feedback', 'interview_notes', 'selected_interview_slot',
-            'selected_slot_info', 'available_slots', 'created_internship', 
+            'selected_slot_info', 'available_slots', 'created_internship',
+            'match_score', 'match_analysis',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['student', 'status', 'company_feedback', 'interview_notes', 
-                          'created_internship', 'created_at', 'updated_at']
+                          'created_internship', 'match_score', 'match_analysis',
+                          'created_at', 'updated_at']
     
     def get_selected_slot_info(self, obj):
         if obj.selected_interview_slot:

@@ -10,6 +10,12 @@ export const AdminSidebarData = [
     cName: "nav-text",
   },
   {
+    title: "Statistics",
+    path: "/statistics",
+    icon: <AiIcons.AiOutlineBarChart />,
+    cName: "nav-text",
+  },
+  {
     title: "Archieved Reports",
     path: "/archieved-reports",
     icon: <AiIcons.AiFillEdit />,
@@ -37,6 +43,12 @@ export const AdminSidebarData = [
     title: "User Management",
     path: "/user-management",
     icon: <AiIcons.AiOutlineUserSwitch />,
+    cName: "nav-text",
+  },
+  {
+    title: "Room Management",
+    path: "/room-management",
+    icon: <AiIcons.AiOutlineBank />,
     cName: "nav-text",
   },
   {

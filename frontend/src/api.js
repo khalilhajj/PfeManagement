@@ -545,6 +545,52 @@ export const deleteSoutenance = async (id) => {
   return response.data;
 };
 
+// ==================== ROOM MANAGEMENT ====================
+
+export const getAvailableRooms = async () => {
+  const response = await API.get("/administrator/rooms/available/", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const getRooms = async () => {
+  const response = await API.get("/administrator/rooms/", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const createRoom = async (data) => {
+  const response = await API.post("/administrator/rooms/create/", data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const updateRoom = async (id, data) => {
+  const response = await API.put(`/administrator/rooms/${id}/update/`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const deleteRoom = async (id) => {
+  const response = await API.delete(`/administrator/rooms/${id}/delete/`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+// ==================== ADMIN STATISTICS ====================
+
+export const getAdminStatistics = async () => {
+  const response = await API.get("/administrator/statistics/", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
 // ==================== COMPANY INTERNSHIP OFFERS ====================
 
 // Company: Get all my offers
@@ -681,6 +727,40 @@ export const selectInterviewSlot = async (applicationId, slotId) => {
   const response = await API.post(
     `/internship/applications/${applicationId}/select-slot/`,
     { slot_id: slotId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
+// ==================== AI MATCHING ====================
+
+// Company: Calculate match score for a single application
+export const calculateApplicationMatch = async (applicationId) => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.post(
+    `/internship/applications/${applicationId}/calculate-match/`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
+// Company: Batch calculate match scores for all applications to an offer
+export const batchCalculateMatches = async (offerId) => {
+  const token = localStorage.getItem("accessToken");
+  const response = await API.post(
+    `/internship/offers/${offerId}/batch-calculate-matches/`,
+    {},
     {
       headers: {
         Authorization: `Bearer ${token}`,

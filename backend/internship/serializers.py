@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import Internship, TeacherInvitation, Notification
+from .models import Internship, TeacherInvitation, Notification, Room
 from authentication.models import User
+from dateutil.relativedelta import relativedelta
 import os
 
 class InternshipSerializer(serializers.ModelSerializer):
@@ -40,12 +41,33 @@ class InternshipSerializer(serializers.ModelSerializer):
             return False
 
     def validate(self, data):
-        """Validate internship dates"""
-        if data.get('start_date') and data.get('end_date'):
-            if data['start_date'] >= data['end_date']:
+        """Validate internship dates and duration"""
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        
+        if start_date and end_date:
+            # Check end date is after start date
+            if start_date >= end_date:
                 raise serializers.ValidationError({
                     'end_date': 'End date must be after start date.'
                 })
+            
+            # Calculate duration in months
+            duration = relativedelta(end_date, start_date)
+            total_months = duration.years * 12 + duration.months
+            
+            # Check minimum duration (4 months)
+            if total_months < 4:
+                raise serializers.ValidationError({
+                    'end_date': 'Internship duration must be at least 4 months.'
+                })
+            
+            # Check maximum duration (6 months)
+            if total_months > 6:
+                raise serializers.ValidationError({
+                    'end_date': 'Internship duration cannot exceed 6 months.'
+                })
+        
         return data
 
     def validate_cahier_de_charges(self, value):
@@ -158,3 +180,14 @@ class NotificationSerializer(serializers.ModelSerializer):
         model = Notification
         fields = ['id', 'recipient', 'message', 'is_read', 'created_at']
         read_only_fields = ['recipient', 'created_at']
+
+class RoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Room
+        fields = ['id', 'name', 'building', 'capacity', 'floor', 'equipment', 'is_available', 'created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at']
+    
+    def validate_capacity(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Capacity must be greater than 0")
+        return value

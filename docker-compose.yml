@@ -126,15 +126,15 @@ services:
       - .env
 
   frontend:
-  build: ./frontend
-  ports:
-    - "3000:3000"
-  volumes:
-    - ./frontend:/app
-    - /app/node_modules
-  environment:
-    NODE_ENV: development
-  command: sh -c "npm install && npm start"
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+    command: sh -c "npm install && npm start"
 
 volumes:
   pfemanagement_pgdata:
