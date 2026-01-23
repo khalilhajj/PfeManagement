@@ -3,74 +3,78 @@ Web scraping module for internship opportunities
 Scrapes job/internship listings from various sources
 """
 
-import cloudscraper
+import undetected_chromedriver as uc
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import re
 from django.utils import timezone
-import warnings
 import time
 
-# Suppress SSL warnings (only for development/testing)
-warnings.filterwarnings('ignore', message='Unverified HTTPS request')
-import urllib3
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-
-def scrape_tanitjobs():
+def scrape_tanitjobs(html_content=None):
     """
     Scrape internship opportunities from Tanitjobs.tn
+    If html_content is provided, parses that instead of fetching from web.
     Returns list of dicts with opportunity data
     """
+    import cloudscraper
+    
     opportunities = []
     
     try:
-        # Create a cloudscraper instance to bypass Cloudflare
-        scraper = cloudscraper.create_scraper(
-            browser={
-                'browser': 'chrome',
-                'platform': 'linux',
-                'mobile': False
-            }
-        )
+        soup = None
         
-        # Scrape main page for "Dernières Offres d'emploi"
-        url = "https://www.tanitjobs.com/"
+        if html_content:
+            print("Parsing provided HTML content...")
+            soup = BeautifulSoup(html_content, 'html.parser')
+        else:
+            print("Starting Cloudscraper...")
+            scraper = cloudscraper.create_scraper()
+            
+            url = "https://www.tanitjobs.com/"
+            print(f"Loading {url}...")
+            response = scraper.get(url)
+            
+            if response.status_code != 200:
+                print(f"Failed to load page: {response.status_code}")
+                return opportunities
+                
+            soup = BeautifulSoup(response.content, 'html.parser')
         
-        print(f"Fetching Tanitjobs main page...")
-        response = scraper.get(url, timeout=30)
+        # Find the main section with latest job offers
+        main_section = soup.find('section', class_='main-sections__listing__latest')
+        if not main_section:
+            print("Could not find main section with job listings")
+            # Try finding the container directly if section class changed
+            main_section = soup.find('div', class_='listing__title')
+            if main_section:
+                main_section = main_section.find_parent('section')
+            
+            if not main_section:
+                return opportunities
         
-        print(f"Tanitjobs main page status: {response.status_code}")
+        # Find job listings within the section
+        job_cards = main_section.find_all('article', class_='listing-item__jobs')
         
-        if response.status_code != 200:
-            print(f"Failed to fetch main page: {response.status_code}")
-            return opportunities
+        print(f"Found {len(job_cards)} job listings")
         
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        # Find job listings - look for "Dernières Offres d'emploi"
-        job_cards = soup.find_all('article', class_='listing-item__jobs')
-        
-        print(f"Found {len(job_cards)} job listings on main page")
-        
-        for card in job_cards[:10]:  # Limit to 10 jobs
+        for card in job_cards[:15]:  # Limit to 15 jobs
             try:
-                # Extract title and URL
-                title_elem = card.find('div', class_='listing-item__title')
-                if not title_elem:
+                # Extract title and URL from the <a> tag
+                title_link = card.find('a', class_='link')
+                if not title_link:
                     continue
                 
-                link_elem = title_elem.find('a', class_='link')
-                if not link_elem:
+                title = title_link.get_text(strip=True)
+                job_url = title_link.get('href', '')
+                
+                if not job_url or not title:
                     continue
                 
-                title = link_elem.get_text(strip=True)
-                job_url = link_elem.get('href', '')
-                
-                if not job_url:
-                    continue
-                
-                # Extract company
+                # Extract company name
                 company_elem = card.find('span', class_='listing-item-info-company')
                 company = company_elem.get_text(strip=True).replace(' - ', '').strip() if company_elem else "Not specified"
                 
@@ -78,77 +82,182 @@ def scrape_tanitjobs():
                 location_elem = card.find('span', class_='listing-item-info-location')
                 location = location_elem.get_text(strip=True) if location_elem else "Tunisia"
                 
-                # Fetch job details page
-                print(f"Fetching details for: {title[:50]}...")
+                # Extract date
+                date_elem = card.find('div', class_='listing-item__date')
+                date_posted = date_elem.get_text(strip=True) if date_elem else ""
                 
-                time.sleep(2)  # Be polite to the server
+                print(f"Processing: {title[:50]}...")
                 
-                detail_response = scraper.get(job_url, timeout=30)
-                
-                if detail_response.status_code != 200:
-                    print(f"Failed to fetch details (status {detail_response.status_code}), using basic info")
-                    # Use basic info without details
-                    opportunities.append({
-                        'title': title[:255],
-                        'description': f"Position at {company}. Location: {location}. Visit {job_url} for more details.",
-                        'requirements': f"Company: {company}",
-                        'location': location[:255],
-                        'company_name': company[:255],
-                        'source': 'Tanitjobs',
-                        'url': job_url
-                    })
-                    continue
-                
-                detail_soup = BeautifulSoup(detail_response.content, 'html.parser')
-                
-                # Extract full description
-                description_text = ""
-                requirements_text = ""
-                
-                # Find all h3 titles and their following content
-                titles_h3 = detail_soup.find_all('h3', class_='details-body__title')
-                
-                for h3 in titles_h3:
-                    title_text = h3.get_text(strip=True)
-                    content_div = h3.find_next_sibling('div', class_='details-body__content')
-                    
-                    if content_div:
-                        content = content_div.get_text(separator='\n', strip=True)
+                full_description = f"Poste chez {company}.\nLieu: {location}.\nDate de publication: {date_posted}"
+                requirements_text = f"Entreprise: {company}"
+
+                # Only try to fetch details if we are in online mode
+                if not html_content and job_url:
+                    try:
+                        # Visit job details page
+                        print(f"Loading details page: {job_url[:80]}...")
+                        # Use same scraper instance
+                        detail_response = scraper.get(job_url)
                         
-                        if "Description" in title_text:
-                            description_text = content
-                        elif "Exigences" in title_text or "Requirements" in title_text or "exigences" in title_text.lower():
-                            requirements_text = content
-                
-                # Combine description and requirements
-                full_description = description_text if description_text else f"Position at {company}"
-                if requirements_text and requirements_text not in description_text:
-                    full_description += "\n\nExigences:\n" + requirements_text
-                
+                        if detail_response.status_code == 200:
+                            detail_soup = BeautifulSoup(detail_response.content, 'html.parser')
+                            
+                            # Extract full description
+                            description_text = ""
+                            requirements_text_scraped = ""
+                            
+                            # Find all h3 titles and their following content
+                            titles_h3 = detail_soup.find_all('h3', class_='details-body__title')
+                            
+                            for h3 in titles_h3:
+                                title_text = h3.get_text(strip=True)
+                                content_div = h3.find_next_sibling('div', class_='details-body__content')
+                                
+                                if content_div:
+                                    content = content_div.get_text(separator='\n', strip=True)
+                                    
+                                    if "Description" in title_text:
+                                        description_text = content
+                                    elif "Exigences" in title_text or "Requirements" in title_text or "exigences" in title_text.lower():
+                                        requirements_text_scraped = content
+                            
+                            # Combine description and requirements
+                            full_description = description_text if description_text else full_description
+                            if requirements_text_scraped:
+                                requirements_text = requirements_text_scraped
+                                if requirements_text not in full_description:
+                                    full_description += "\n\nExigences:\n" + requirements_text
+                            
+                        else:
+                            print(f"Failed to load details: {detail_response.status_code}")
+                        
+                        time.sleep(1) # Be nice
+                    except Exception as e:
+                        print(f"Error fetching details for {title}: {e}")
+
                 opportunities.append({
                     'title': title[:255],
-                    'description': full_description[:2000],  # Increased limit for full content
-                    'requirements': requirements_text[:500] if requirements_text else f"Company: {company}",
+                    'description': full_description[:2000],
+                    'requirements': requirements_text[:500],
                     'location': location[:255],
                     'company_name': company[:255],
                     'source': 'Tanitjobs',
                     'url': job_url
                 })
                 
-                print(f"✓ Scraped: {title[:50]}...")
+                print(f"✓ Scraped: {title[:50]}")
                 
             except Exception as e:
-                print(f"Error parsing Tanitjobs job: {e}")
+                print(f"Error parsing job: {e}")
                 continue
                 
     except Exception as e:
         print(f"Error scraping Tanitjobs: {e}")
-        import traceback
-        traceback.print_exc()
     
     print(f"Scraped {len(opportunities)} opportunities from Tanitjobs")
     return opportunities
 
+
+def scrape_keejob(html_content=None):
+    """
+    Scrape internship opportunities from Keejob
+    If html_content is provided, parses that instead of fetching from web.
+    Returns list of dicts with opportunity data
+    """
+    import cloudscraper
+    
+    opportunities = []
+    
+    try:
+        soup = None
+        
+        if html_content:
+            print("Parsing provided HTML content for Keejob...")
+            soup = BeautifulSoup(html_content, 'html.parser')
+        else:
+            # For now, we only support offline parsing or placeholder for online
+            pass
+            
+        if not soup:
+            return opportunities
+        
+        # Find job listings
+        # Based on user HTML: div with class "bg-white dark:bg-gray-700 ..."
+        # Using a broader selector to catch the cards
+        job_cards = soup.select('div.grid.grid-cols-1 > div')
+        
+        print(f"Found {len(job_cards)} job listings (candidate blocks)")
+        
+        valid_cards = 0
+        for card in job_cards:
+            try:
+                # Extract title
+                title_elem = card.select_one('h3 a')
+                if not title_elem:
+                    continue
+                
+                title = title_elem.get_text(strip=True)
+                job_url = title_elem.get('href', '')
+                if job_url and not job_url.startswith('http'):
+                    job_url = "https://www.keejob.com" + job_url
+                
+                # Extract company
+                company = "Not specified"
+                # Looking for company link inside the card
+                company_links = card.select('a[href*="/companies/"]')
+                if company_links:
+                    company = company_links[-1].get_text(strip=True)
+                
+                # Extract location
+                location = "Tunisia"
+                location_icon = card.select_one('i.fa-map-marker-alt')
+                if location_icon and location_icon.next_sibling:
+                    location = location_icon.next_sibling.get_text(strip=True)
+                elif location_icon and location_icon.parent:
+                     location = location_icon.parent.get_text(strip=True)
+
+                
+                # Extract description
+                description = ""
+                desc_elem = card.select_one('p.text-sm')
+                if desc_elem:
+                    description = desc_elem.get_text(strip=True)
+                
+                # Extract tags/requirements
+                tags = []
+                for tag in card.select('span.inline-flex'):
+                    tags.append(tag.get_text(strip=True))
+                
+                requirements = " | ".join(tags)
+                
+                full_description = f"{description}\n\nTags: {requirements}\n\nEntreprise: {company}\nLieu: {location}"
+
+                opportunities.append({
+                    'title': title[:255],
+                    'description': full_description[:2000],
+                    'requirements': requirements[:500] if requirements else f"Entreprise: {company}",
+                    'location': location[:255],
+                    'company_name': company[:255],
+                    'source': 'Keejob',
+                    'url': job_url
+                })
+                
+                print(f"✓ Scraped: {title[:50]}")
+                valid_cards += 1
+                
+            except Exception as e:
+                print(f"Error parsing Keejob card: {e}")
+                continue
+    
+        print(f"Scraped {valid_cards} opportunities from Keejob")
+                
+    except Exception as e:
+        print(f"Error scraping Keejob: {e}")
+        import traceback
+        traceback.print_exc()
+    
+    return opportunities
+    
 
 def scrape_generic_rss(rss_url, source_name):
     """
@@ -192,147 +301,28 @@ def scrape_generic_rss(rss_url, source_name):
     return opportunities
 
 
-def scrape_all_sources():
+def scrape_all_sources(html_content=None):
     """
     Scrape all configured sources and return combined results
     """
     all_opportunities = []
     
-    # Scrape from Tanitjobs only
+    # Scrape from Tanitjobs
     print("🔍 Scraping Tanitjobs...")
-    all_opportunities.extend(scrape_tanitjobs())
+    tanitjobs_opps = scrape_tanitjobs(html_content=html_content)
+    all_opportunities.extend(tanitjobs_opps)
+    
+    # Scrape from Keejob
+    print("🔍 Scraping Keejob...")
+    keejob_opps = scrape_keejob(html_content=html_content)
+    all_opportunities.extend(keejob_opps)
     
     # Add more sources here if needed
     # all_opportunities.extend(scrape_generic_rss("https://example.com/jobs.rss", "Example Site"))
     
-    # If no opportunities found, add sample demo data (for testing/demo purposes)
-    if len(all_opportunities) == 0:
-        print("⚠️ No opportunities scraped, adding demo data...")
-        all_opportunities = generate_demo_opportunities()
-    
     print(f"✅ Found {len(all_opportunities)} opportunities total")
     return all_opportunities
 
-
-def generate_demo_opportunities():
-    """
-    Generate demo/sample opportunities for testing
-    This runs when actual scraping fails
-    
-    NOTE: Tanitjobs uses Cloudflare protection which blocks automated scraping.
-    For production, consider:
-    1. Using Selenium with undetected-chromedriver
-    2. Manual API integration (if available)
-    3. Manual data entry through admin panel
-    """
-    demo_opportunities = [
-        {
-            'title': 'Stage PFE : Conception et Développement d\'une Application Mobile',
-            'description': '''Objectifs du stage: Concevoir et développer une application mobile Android offrant les fonctionnalités suivantes :
-- Envoi de SMS et lancement d'appels téléphoniques
-- Analyse automatique des SMS reçus et déclenchement de notifications
-- Visualisation de données sur une carte (position actuelle, historique)
-- Gestion d'un parc d'appareils
-
-Missions:
-- Analyse des besoins fonctionnels et rédaction des spécifications
-- Conception de l'architecture logicielle
-- Développement de l'application mobile
-- Implémentation des mécanismes de communication
-- Intégration des fonctionnalités de cartographie
-- Mise en place d'une stratégie de tests''',
-            'requirements': '''Technologies: Android natif (Kotlin), Architecture MVVM, API REST, Base de données locale, Google Maps SDK
-
-Profil recherché:
-- Étudiant(e) en dernière année d'ingénieur ou master
-- Bonnes bases en programmation (Java/Kotlin)
-- Intérêt pour le développement mobile
-- Autonomie et curiosité technique''',
-            'location': 'Ariana, Tunisie',
-            'company_name': 'Liss Strike',
-            'source': 'Tanitjobs (Demo)',
-            'url': 'https://www.tanitjobs.com/job/stage-pfe-conception-developpement-application-mobile/'
-        },
-        {
-            'title': 'Stage PFE : Développement d\'un Chatbot Commercial et SAV Multicanal',
-            'description': '''Développement d'un chatbot intelligent pour le service commercial et SAV.
-
-Missions:
-- Conception de l'architecture du chatbot
-- Développement des fonctionnalités conversationnelles
-- Intégration multicanale (web, mobile, réseaux sociaux)
-- Mise en place du NLP et machine learning
-- Tests et optimisation des réponses automatiques''',
-            'requirements': '''Technologies: Python, NLP, TensorFlow/PyTorch, API REST, React
-
-Profil: Étudiant en dernière année ingénieur/master, connaissances en IA/ML, Python''',
-            'location': 'Ariana, Tunisie',
-            'company_name': 'Liss Strike',
-            'source': 'Tanitjobs (Demo)',
-            'url': 'https://www.tanitjobs.com/job/stage-pfe-developpement-chatbot-commercial-sav-multicanal/'
-        },
-        {
-            'title': 'PFE – Spring Boot & Angular (Remote)',
-            'description': '''Développement d'une application web avec Spring Boot et Angular.
-
-Missions:
-- Développement backend avec Spring Boot
-- Développement frontend avec Angular
-- Intégration des APIs REST
-- Tests unitaires et d'intégration
-- Déploiement et documentation
-
-Le stage peut être effectué en remote (100% télétravail).''',
-            'requirements': '''Technologies: Spring Boot, Angular, PostgreSQL/MySQL, Git
-
-Profil: Étudiant en informatique, connaissances en Java et frameworks web modernes''',
-            'location': 'Remote, Tunisie',
-            'company_name': 'Kynalix Tech',
-            'source': 'Tanitjobs (Demo)',
-            'url': 'https://www.tanitjobs.com/job/pfe-spring-boot-angular-remote/'
-        },
-        {
-            'title': 'Stage Data Science & Machine Learning',
-            'description': '''Opportunité de stage en Data Science. Travail sur des projets d'analyse de données et machine learning.
-
-Missions:
-- Analyse exploratoire des données
-- Préparation et nettoyage des datasets
-- Développement de modèles ML
-- Visualisation des résultats
-- Déploiement des modèles en production''',
-            'requirements': '''Technologies: Python, Pandas, scikit-learn, TensorFlow, Jupyter
-
-Profil: Connaissances en mathématiques/statistiques, Python, passion pour la data''',
-            'location': 'Tunis, Tunisie',
-            'company_name': 'Tech Innovators',
-            'source': 'Tanitjobs (Demo)',
-            'url': 'https://www.tanitjobs.com/job/stage-data-science-machine-learning/'
-        },
-        {
-            'title': 'Stage DevOps & Cloud Computing',
-            'description': '''Stage en DevOps avec focus sur AWS/Azure.
-
-Missions:
-- Mise en place de pipelines CI/CD
-- Conteneurisation avec Docker
-- Orchestration avec Kubernetes
-- Automatisation de l'infrastructure (IaC)
-- Monitoring et logging
-- Déploiement cloud (AWS/Azure)
-
-Excellente opportunité d'apprentissage dans un environnement professionnel.''',
-            'requirements': '''Technologies: Docker, Kubernetes, Jenkins/GitLab CI, AWS/Azure, Terraform
-
-Profil: Étudiant passionné par le DevOps et l'automatisation''',
-            'location': 'Sousse, Tunisie',
-            'company_name': 'CloudOps Solutions',
-            'source': 'Tanitjobs (Demo)',
-            'url': 'https://www.tanitjobs.com/job/stage-devops-cloud-computing/'
-        },
-    ]
-    
-    return demo_opportunities
 
 
 def clean_and_validate_opportunity(opp_data):

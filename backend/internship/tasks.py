@@ -31,7 +31,7 @@ def check_soutenance_status():
 
 
 @shared_task
-def scrape_internship_opportunities():
+def scrape_internship_opportunities(html_content=None):
     """
     Periodic task to scrape internship opportunities from external sources
     Runs daily to find new opportunities
@@ -47,7 +47,7 @@ def scrape_internship_opportunities():
             return "Error: company user not found"
         
         # Scrape opportunities from all sources
-        opportunities = scrape_all_sources()
+        opportunities = scrape_all_sources(html_content=html_content)
         
         created_count = 0
         duplicate_count = 0
